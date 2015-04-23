@@ -1,0 +1,1 @@
+#Comando para la configuración inicial del entorno de ejecución del Sistema
