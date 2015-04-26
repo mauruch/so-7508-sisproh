@@ -8,10 +8,10 @@
 #Si Mover es llamado sin comandos avisar
 if [ $# -ne 3 -a $# -ne 2 ]
 then
-	echo "Para utilizar Mover correctamente:"
+	echo "Para utilizar Mover.sh correctamente:"
 	echo "Mover ArchivoAMover Destino QuienHaceLaLlamada(opcional)"
 	#registrando en el log
-	./Glog.sh "$0" 'Comando Mover.sh fue mal utilizado' 'ERR'
+	./Glog.sh "$0" 'Comando fue mal utilizado' 'ERR'
 	exit 1
 fi
 
