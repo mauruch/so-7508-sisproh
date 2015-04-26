@@ -3,7 +3,11 @@
 
 #Como va a ser llamada:
 #Glog ComandoQueLoLlamo 'Mensaje' TipoDeMensaje(opcional)
-#Ejemplo: Glog Mover.sh 'Moviendo archivo tal a tal lado' 'INF'
+#Ejemplo: Glog Mover.sh 'Moviendo archivo tal a tal lado' 'INFO'
+
+#INFO = INFORMATIVO: mensajes explicativos sobre el curso de ejecución del comando. Ejemplo: funciona todo joya
+#WAR = WARNING: mensajes de advertencia pero que no afectan la continuidad de ejecución. Ejemplo: archivo duplicado
+#ERR = ERROR: mensajes de error Ej: Archivo Inexistente.
 
 
 
@@ -23,7 +27,7 @@ logPath='log.txt'
 #placeholder de usuario
 user=$USERNAME
 #Tipo de mensaje por default
-defaultMessageType='INF'
+defaultMessageType='INFO'
 defaultCommandCaller='Glog.sh'
 
 #Si Glog es llamado sin la cantidad de comandos correctos mostrar mensaje

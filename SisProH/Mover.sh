@@ -11,7 +11,7 @@ then
 	echo "Para utilizar Mover correctamente:"
 	echo "Mover ArchivoAMover Destino QuienHaceLaLlamada(opcional)"
 	#registrando en el log
-	echo "Comando Mover fue mal utilizado" >> log.txt
+	./Glog.sh "$0" 'Comando Mover.sh fue mal utilizado' 'ERR'
 	exit 1
 fi
 
@@ -26,7 +26,9 @@ then
 	#registro esto en el log
 	if [ $# -eq 3 ]
 	then
-		echo "Comando Mover fue utilizado con origen igual a destino. Llamado por $3" >> log.txt
+		./Glog.sh "$3" "Comando Mover.sh fue utilizado con origen igual a destino. Llamado por $3" 'INF'
+	else
+		./Glog.sh "$0" "Comando Mover.sh fue utilizado con origen igual a destino. Llamado por $3" 'INF'
 	fi
 	exit 0
 fi
@@ -38,7 +40,9 @@ then
 	#registro esto en el log
 	if [ $# -eq 3 ]
 	then
-		echo "Mover llamado con directorio Origen inexistente por llamador. Archivo $1 no movido. Llamado por $3" >> log.txt
+		./Glog.sh "$3" "Directorio $ORIGENDIR inexistente, archivo $ORIGENFILE no movido." 'ERR'
+	else
+		./Glog.sh "$0" "Directorio $ORIGENDIR inexistente, archivo $ORIGENFILE no movido." 'ERR'
 	fi
 	exit 1
 fi
@@ -50,7 +54,9 @@ then
 	#registro esto en el log
 	if [ $# -eq 3 ]
 	then
-		echo "Mover llamado con directorio Destino inexistente por llamador. Archivo $1 no movido. Llamado por $3" >> log.txt
+		./Glog.sh "$3" "Directorio $2 inexistente, archivo $ORIGENFILE no movido." 'ERR'
+	else
+		./Glog.sh "$0" "Directorio $2 inexistente, archivo $ORIGENFILE no movido." 'ERR'
 	fi
 	exit 1
 fi
@@ -59,6 +65,13 @@ fi
 if [ ! -f "$1" ]
 then
 	echo "No existe el archivo especificado en el Origen"
+	#registro esto en el log
+	if [ $# -eq 3 ]
+	then
+		./Glog.sh "$3" "No existe $1." 'ERR'
+	else
+		./Glog.sh "$0" "No existe $1." 'ERR'
+	fi
 	exit 1
 fi
 
@@ -70,13 +83,21 @@ FILEDESTINY="$2""/""$ORIGENFILE"
 if [ ! -f "$FILEDESTINY" ]
 then
 	mv "$1" "$FILEDESTINY"
+	if [ $# -eq 3 ]
+	then
+		./Glog.sh "$3" "$1 movido a $2" 'INF'
+	else
+		./Glog.sh "$0" "$1 movido a $2" 'INF'
+	fi
+	exit 0
 else
 	FLAGENTER=0
 	COUNTERLAST=0
 	COUNTERMIDDLE=0
 	COUNTERFIRST=0
-	#Esta direccion tiene que venir de algun lado, variable de entorno padre, al llamar o algo
+	#TODO Esta direccion tiene que venir de algun lado, variable de entorno padre, al llamar o algo
 	DUPLICATEDDIRECTORY='/home/fdc/Documents/SistemasOperativos/Trabajo Práctico/SisProH/DUPDIR'
+	##############################################################################################
 	DUPLICATEDDIRECTORYDESTINY="$DUPLICATEDDIRECTORY""/""$ORIGENFILE"".""$COUNTERFIRST""$COUNTERMIDDLE""$COUNTERLAST"
 	#Me fijo si ya existe uno con esos
 	if [ ! -f "$DUPLICATEDDIRECTORYDESTINY" ]
@@ -107,7 +128,14 @@ else
 			then
 				mv "$1" "$DUPLICATEDDIRECTORYDESTINY"
 				echo "Archivo movido a la carpeta $DUPLICATEDDIRECTORY bajo el nombre: $ORIGENFILE.$COUNTERFIRST$COUNTERMIDDLE$COUNTERLAST"
+				if [ $# -eq 3 ]
+				then
+					./Glog.sh "$3" "$1 movido a $DUPLICATEDDIRECTORY$ORIGENFILE.$COUNTERFIRST$COUNTERMIDDLE$COUNTERLAST" 'WAR'
+				else
+					./Glog.sh "$0" "$1 movido a $2" 'WAR'
+				fi
 				FLAGENTER=1
+				exit 0
 			fi
 		done
 	fi
