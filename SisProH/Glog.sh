@@ -23,7 +23,7 @@
 #
 
 #creo un placeholder para que lo escriba en el mismo directorio
-logPath='log.txt'
+logPathDefault='log.txt'
 #placeholder de usuario
 user=$USERNAME
 #Tipo de mensaje por default
@@ -37,8 +37,31 @@ then
 	echo "Glog ComandoQueLoLlamo 'Mensaje' TipoDeMensaje(opcional)"
 	#registrando en el log
 	defaultMessageType='ERR'
-	echo `date +%F`"|"`date +%T`" $user $defaultCommandCaller $defaultMessageType Comando Mover fue mal utilizado" >> "$logPath"
+	echo `date +%F`"|"`date +%T`" $user $defaultCommandCaller $defaultMessageType Comando Mover fue mal utilizado" >> "$logPathDefault"
 	exit 1
+fi
+
+#Acá asigno los directorios
+#PELIGRO CASCADA DE IFS
+#Espero no olvidarme de ninguno
+if [ $1 == 'Mover.sh' -o $1 == 'Glog.sh' -o $1 == 'Start.sh' -o $1 == 'Stop.sh' -o $1 == 'InfPro.pl' -o $1 == 'IniPro.sh' -o $1 == 'RecPro.sh' -o $1 == 'IniPro.sh' ]
+then
+	logPath = "$logPathDefault"
+else
+	if [ $1 == 'ProPro.sh' ]
+	then
+		logPath = "/LOGDIR/ProPro"
+	else
+		if [ $1 == 'InsPro.sh' ]
+		then
+			#TODO ver donde va ese log
+			logPath = "InsProLog.txt"
+		else
+			echo "Instrucción no reconocida"
+			echo `date +%F`"|"`date +%T`" $user $defaultCommandCaller $defaultMessageType Comando Mover no reconoció el programa especificado en su primer variable" >> "$logPathDefault"
+			exit 1
+		fi
+	fi
 fi
 
 if [ $# -eq 3 ]
