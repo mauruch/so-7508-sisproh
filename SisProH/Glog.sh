@@ -60,12 +60,9 @@ else
 fi
 
 #Acá debería verificar que no se exceda de tanto
-echo "pepe"
 if [ -f "$logPath" ]
 then
-	echo "$logPath"
 	lineasQueTieneElArchivo=`wc -l $logPath | cut -d ' ' -f 1`
-	echo "$lineasQueTieneElArchivo"
 	if [ $lineasQueTieneElArchivo -ge $defaultMaxLines ]
 	then
 		sed -i -e '1,450d' "$logPath"
