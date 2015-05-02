@@ -25,7 +25,7 @@ function aceptarArch {
 	codGestion=${1%%_*} 
 	mkdir -p "$carpetaAceptados/$codGestion"
 	./Mover.sh "$carpetaNovedades/$1" "$carpetaAceptados/$codGestion"
-echo "script" $nombreScript
+	echo "script" $nombreScript
 	./Glog.sh $nombreScript "El archivo $1 ha sido aceptado y movido a la carpeta $carpetaAceptados/$codGestion"
 
 }
@@ -34,7 +34,8 @@ echo "script" $nombreScript
 # Función que sirve para rechazar un archivo
 # $1 es la ruta del archivo
 function rechazarArch {
-	Mover.sh "$1" "$carpetaRechazados/"
+	./Mover.sh "$carpetaNovedades/$1" "$carpetaRechazados"
+
 }
 
 
@@ -70,11 +71,12 @@ function valExtensionArch(){
   
 function valFormatoNombreArch(){
 	nombre=$1
+	mensajeError=( "Gestión Inexistente" "Norma Inexistente" "Emisor Inexistente" "-" "Fecha Fuera de Rango" )
 
 	#nombre=${1%%\\n}
 	#echo $nombre
 
-	formatoNombre='^[A-Z,a-z,0-9]*_[A-Z]*_[0-9]*_[0-9]*_[0-9][0-9]-[0-9][0-9]-[0-9][0-9][0-9][0-9]$'
+	formatoNombre='^[A-Z,a-z,0-9]*_[A-Z]*_[0-9]*_[0-9]*_[0-3][0-9]-[0-1][0-9]-[0-9][0-9][0-9][0-9]$'
 	nombreValido=`echo "$nombre" | grep "$formatoNombre" | wc -l`
 	echo "prueba: "$nombreValido
 
@@ -147,15 +149,17 @@ function valFormatoNombreArch(){
 
 		if [ $nombreValido -eq 0 ]
 		then
-			let=$cont-1
-			echo "nombre inválido $cont"
+			let cont=$cont-2
+			mensaje="Nombre inválido, "${mensajeError[$cont]}
+			./Glog.sh $nombreScript "El archivo $1 ha sido rechazado por: $mensaje"
 			return 0
 		else
 			return 1
 		fi
 		
 	else
-		echo "nombre inválido"
+		mensaje="Cantidad de campos inválido"
+		./Glog.sh $nombreScript "El archivo $1 ha sido rechazado por: $mensaje"
 		return 0
 	fi
 
@@ -193,26 +197,53 @@ then
 		echo $validacion
 		if [ $validacion -eq 1 ]
 		then
-			valFormatoNombreArch $arch
-			validacion=$?
-			echo $validacion
-			if [ $validacion -eq 1 ]
+		
+			#chequeo que el archivo no esté vacío
+			if [ -s $arch ]
 			then
-				echo "todo bien"
-				aceptarArch $arch 
+				valFormatoNombreArch $arch
+				validacion=$?
+				echo $validacion
+				if [ $validacion -eq 1 ]
+				then
+					echo "todo bien"
+					aceptarArch $arch 
+				else
+					echo "mover a rechazados"
+					rechazarArch $arch 
+				
+				fi
 			else
 				echo "mover a rechazados"
-				
+				./Glog.sh  $nombreScript "El archivo $arch ha sido rechazado por: Archivo vacío"
+				rechazarArch $arch 
 			fi
 
 		else
-
 			echo "mover a rechazados"
+			./Glog.sh  $nombreScript "El archivo $arch ha sido rechazado por: Tipo Inválido"
+			rechazarArch $arch 
 
 		fi
 
 	done
 
 else
-    echo "si no hay archivos ir al paso NOVEDADES PENDIENTES"
+    	echo "si no hay archivos ir al paso NOVEDADES PENDIENTES"
+	res=`ps -C "ProPro.sh" | wc -l `
+	#res cuenta una línea más a la cantidad de procesos
+	if [ $res -gt 1 ]
+	then
+		pid=`pgrep feprima.sh`
+		echo "ProPro ya corriendo bajo el no.: $pid"
+		./Glog.sh  $nombreScript "ProPro ya corriendo bajo el no.: $pid"
+	else
+		./ProPro.sh &
+		echo "ProPro corriendo bajo el no.: $!"
+		./Glog.sh  $nombreScript "ProPro corriendo bajo el no.: $!"
+	fi
+
+	sleep 60
+
+
 fi
