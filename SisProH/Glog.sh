@@ -23,12 +23,13 @@
 #
 
 #creo un placeholder para que lo escriba en el mismo directorio
-logPathDefault='log.txt'
+logPathDefault='LOGDIR/Glog.sh.txt'
 #placeholder de usuario
 user=$USERNAME
 #Tipo de mensaje por default
 defaultMessageType='INFO'
 defaultCommandCaller='Glog.sh'
+defaultMaxLines=500
 
 #Si Glog es llamado sin la cantidad de comandos correctos mostrar mensaje
 if [ $# -ne 3 -a $# -ne 2 ]
@@ -38,31 +39,39 @@ then
 	#registrando en el log
 	defaultMessageType='ERR'
 	echo `date +%F`"|"`date +%T`" $user $defaultCommandCaller $defaultMessageType Comando Mover fue mal utilizado" >> "$logPathDefault"
+	
+	lineasQueTieneElArchivo=`wc -l $logPathDefault | cut -d ' ' -f 1`	
+	if [ $lineasQueTieneElArchivo -ge $defaultMaxLines ]
+	then
+		#Acá tengo que borrar
+		sed -i -e '1,450d' "$logPathDefault"
+	fi
 	exit 1
 fi
 
 #Acá asigno los directorios
-#PELIGRO CASCADA DE IFS
-#Espero no olvidarme de ninguno
-if [ $1 == 'Mover.sh' -o $1 == 'Glog.sh' -o $1 == 'Start.sh' -o $1 == 'Stop.sh' -o $1 == 'InfPro.pl' -o $1 == 'IniPro.sh' -o $1 == 'RecPro.sh' -o $1 == 'IniPro.sh' ]
+if [ $1 == 'Mover.sh' -o $1 == 'Glog.sh' -o $1 == 'Start.sh' -o $1 == 'ProPro.sh' -o $1 == 'InsPro.sh' -o $1 == 'Stop.sh' -o $1 == 'InfPro.pl' -o $1 == 'IniPro.sh' -o $1 == 'RecPro.sh' -o $1 == 'IniPro.sh' ]
 then
-	logPath = "$logPathDefault"
-else
-	if [ $1 == 'ProPro.sh' ]
+	logPath="LOGDIR/""$1"".txt"
+else		
+	echo "Instrucción no reconocida"
+	echo `date +%F`"|"`date +%T`" $user $defaultCommandCaller $defaultMessageType Comando Glog no reconoció el script pasado como primer parámetro" >> "$logPathDefault"
+	exit 1	
+fi
+
+#Acá debería verificar que no se exceda de tanto
+echo "pepe"
+if [ -f "$logPath" ]
+then
+	echo "$logPath"
+	lineasQueTieneElArchivo=`wc -l $logPath | cut -d ' ' -f 1`
+	echo "$lineasQueTieneElArchivo"
+	if [ $lineasQueTieneElArchivo -ge $defaultMaxLines ]
 	then
-		logPath = "/LOGDIR/ProPro"
-	else
-		if [ $1 == 'InsPro.sh' ]
-		then
-			#TODO ver donde va ese log
-			logPath = "InsProLog.txt"
-		else
-			echo "Instrucción no reconocida"
-			echo `date +%F`"|"`date +%T`" $user $defaultCommandCaller $defaultMessageType Comando Mover no reconoció el programa especificado en su primer variable" >> "$logPathDefault"
-			exit 1
-		fi
+		sed -i -e '1,450d' "$logPath"
 	fi
 fi
+
 
 if [ $# -eq 3 ]
 then
