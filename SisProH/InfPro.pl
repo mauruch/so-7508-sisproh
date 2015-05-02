@@ -60,6 +60,7 @@ sub menuAyuda {
 sub menuConsulta {
 	my ($opcionUno, @opcionDos, @opcionTres, $opcionCuatro, $opcionCinco, $opcionesTipeadas, @opcionesElegidas);
 	my ($flagUno, $flagDos, $flagTres, $flagCuatro, $flagCinco);
+	my ($desde, $hasta);
 	print "\n\t\tMenu de consulta\n\n";
 	print "Seleccione un filtro que desee aplicar, debe seleccionar almenos uno\n";
 	print "Filtrar por:\n";
@@ -101,24 +102,49 @@ sub menuConsulta {
 	}
 	#Ahora pregunto que valor quiere por cada opción elegida
 	if ($flagUno){
-		print "Filtro por tipo de norma:\n";
-		print "1_Todas\n";
-		print "2_Eliga una\n";
-		$opcionUsuario = <STDIN>;
-
 		while (1){
-			if ($opcionUsuario == 1 or $opcionUsuario ==2){				
-				last;
-			}
 			print "Filtro por tipo de norma:\n";
 			print "1_Todas\n";
 			print "2_Eliga una\n";
 			$opcionUsuario = <STDIN>;
+
+			if ($opcionUsuario == 1 or $opcionUsuario ==2){				
+				last;
+			}
 		}
+
 		if ($opcionUsuario == 2){
 			print "\nElija un tipo de norma\n";
 			$opcionUno = <STDIN>;
+		}
+		else {
+			$opcionUno = "";	#Que la linea vacia signifique todas
 		}		
+	}
+
+	if ($flagDos){
+		while (1){
+			print "Filtro por año:\n";
+			print "1_Todos\n";
+			print "2_Rango\n";
+			$opcionUsuario = <STDIN>;
+
+			if ($opcionUsuario == 1 or $opcionUsuario ==2){				
+				last;
+			}
+		}
+
+		if ($opcionUsuario == 2){
+			print "Desde:\n";
+			$desde = <STDIN>;
+			print "Hasta:\n";
+			$hasta = <STDIN>;
+			@opcionDos = ($desde, $hasta);
+		}
+		else{
+			@opcionDos = (0, 2100);
+		}		
+
 	}
 
 

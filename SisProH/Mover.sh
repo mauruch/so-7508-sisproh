@@ -1,9 +1,11 @@
 #Una Función (en Shell o en Perl) denominada Mover que se emplea para mover archivos
 
 #Como va a ser llamada:
-#Mover archivoAMover destino quienLoLlamo
+#Mover archivoAMover destino quienLoLlamo(opcional)
 #Ejemplo: Mover /root/tp/SinProcesar/wasd.txt /root/tp/Procesados ProPro.sh
 #NOTAR QUE Destino NO TIENE COMO CARACTER FINAL LA BARRA /
+
+defaultCaller="Mover.sh"
 
 #Si Mover es llamado sin comandos avisar
 if [ $# -ne 3 -a $# -ne 2 ]
@@ -11,7 +13,7 @@ then
 	echo "Para utilizar Mover.sh correctamente:"
 	echo "Mover ArchivoAMover Destino QuienHaceLaLlamada(opcional)"
 	#registrando en el log
-	./Glog.sh "$0" 'Comando fue mal utilizado' 'ERR'
+	./Glog.sh "$defaultCaller" 'Comando fue mal utilizado' 'ERR'
 	exit 1
 fi
 
@@ -28,7 +30,7 @@ then
 	then
 		./Glog.sh "$3" "Comando Mover.sh fue utilizado con origen igual a destino. Llamado por $3" 'INF'
 	else
-		./Glog.sh "$0" "Comando Mover.sh fue utilizado con origen igual a destino. Llamado por $3" 'INF'
+		./Glog.sh "$defaultCaller" "Comando Mover.sh fue utilizado con origen igual a destino. Llamado por $3" 'INF'
 	fi
 	exit 0
 fi
@@ -42,7 +44,7 @@ then
 	then
 		./Glog.sh "$3" "Directorio $ORIGENDIR inexistente, archivo $ORIGENFILE no movido." 'ERR'
 	else
-		./Glog.sh "$0" "Directorio $ORIGENDIR inexistente, archivo $ORIGENFILE no movido." 'ERR'
+		./Glog.sh "$defaultCaller" "Directorio $ORIGENDIR inexistente, archivo $ORIGENFILE no movido." 'ERR'
 	fi
 	exit 1
 fi
@@ -56,7 +58,7 @@ then
 	then
 		./Glog.sh "$3" "Directorio $2 inexistente, archivo $ORIGENFILE no movido." 'ERR'
 	else
-		./Glog.sh "$0" "Directorio $2 inexistente, archivo $ORIGENFILE no movido." 'ERR'
+		./Glog.sh "$defaultCaller" "Directorio $2 inexistente, archivo $ORIGENFILE no movido." 'ERR'
 	fi
 	exit 1
 fi
@@ -70,7 +72,7 @@ then
 	then
 		./Glog.sh "$3" "No existe $1." 'ERR'
 	else
-		./Glog.sh "$0" "No existe $1." 'ERR'
+		./Glog.sh "$defaultCaller" "No existe $1." 'ERR'
 	fi
 	exit 1
 fi
@@ -87,7 +89,7 @@ then
 	then
 		./Glog.sh "$3" "$1 movido a $2" 'INF'
 	else
-		./Glog.sh "$0" "$1 movido a $2" 'INF'
+		./Glog.sh "$defaultCaller" "$1 movido a $2" 'INF'
 	fi
 	exit 0
 else
@@ -132,7 +134,7 @@ else
 				then
 					./Glog.sh "$3" "$1 movido a $DUPLICATEDDIRECTORY$ORIGENFILE.$COUNTERFIRST$COUNTERMIDDLE$COUNTERLAST" 'WAR'
 				else
-					./Glog.sh "$0" "$1 movido a $2" 'WAR'
+					./Glog.sh "$defaultCaller" "$1 movido a $2" 'WAR'
 				fi
 				FLAGENTER=1
 				exit 0
