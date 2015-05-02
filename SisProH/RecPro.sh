@@ -25,6 +25,7 @@ function aceptarArch {
 	codGestion=${1%%_*} 
 	mkdir -p "$carpetaAceptados/$codGestion"
 	./Mover.sh "$carpetaNovedades/$1" "$carpetaAceptados/$codGestion"
+echo "script" $nombreScript
 	./Glog.sh $nombreScript "El archivo $1 ha sido aceptado y movido a la carpeta $carpetaAceptados/$codGestion"
 
 }
@@ -146,7 +147,8 @@ function valFormatoNombreArch(){
 
 		if [ $nombreValido -eq 0 ]
 		then
-			echo "nombre inválido"
+			let=$cont-1
+			echo "nombre inválido $cont"
 			return 0
 		else
 			return 1
@@ -200,7 +202,7 @@ then
 				aceptarArch $arch 
 			else
 				echo "mover a rechazados"
-				mensaje= 
+				
 			fi
 
 		else
