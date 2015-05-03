@@ -16,7 +16,7 @@ nombreComando=RecPro
 sePuedeEjecutar()
 {
 	#if ! [ -f $Glog ]; then
-	echo "No se puede ejecutar: primero se debe ejecutar iniciarC.sh"
+	echo "No se puede ejecutar: primero se debe ejecutar RecPro.sh"
 	#echo ""
 	#exit 1
 	#fi

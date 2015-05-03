@@ -17,36 +17,43 @@ $checkInfodir = "INFODIR";
 $checkProcdir = "PROCDIR";
 #Y lo meto en un array para usar un foreach, porque el foreach es lo mas grande que hay, como manaos
 @arrayDeCheckeos = ($checkEmisores,$checkNormas,$checkGestiones,$checkInfodir,$checkProcdir);
+my $count_args = $#ARGV + 1;
 
-foreach $check (@arrayDeCheckeos){
-	if (! -e "$check"){
-		print "No se encuentra $check\n";		
+&checkeos;
+&decideWhatToDo;
+#Si llego acá es porque no ingresó ningun comando
+&menuSuperAyuda;
+
+sub decideWhatToDo {
+	if ($ARGV[0] eq '-a'){
+	&menuAyuda;
+	exit;
+	}
+
+	if ($ARGV[0] eq '-c' or $ARGV[0] eq '-cg'){
+		&menuConsulta;
+		exit;
+	}
+
+	if ($ARGV[0] eq '-i' or $ARGV[0] eq '-ig'){
+		&menuInforme;
+		exit;
+	}
+
+	if ($ARGV[0] eq '-e' or $ARGV[0] eq '-eg'){
+		&menuEstadistica;
+		exit;
 	}
 }
 
-
-if ($ARGV[0] eq '-a'){
-	&menuAyuda;
-	exit;
+sub checkeos {
+	foreach $check (@arrayDeCheckeos){
+		if (! -e "$check"){
+			print "No se encuentra $check\n";
+			exit;
+		}
+	}
 }
-
-if ($ARGV[0] eq '-c' or $ARGV[0] eq '-cg'){
-	&menuConsulta;
-	exit;
-}
-
-if ($ARGV[0] eq '-i' or $ARGV[0] eq '-ig'){
-	&menuInforme;
-	exit;
-}
-
-if ($ARGV[0] eq '-e' or $ARGV[0] eq '-eg'){
-	&menuEstadistica;
-	exit;
-}
-
-#Si llego acá es porque no ingresó ningun comando
-&menuSuperAyuda;
 
 sub menuAyuda {
 	print "\n\t\tMenu de ayuda\n\n";
@@ -58,61 +65,43 @@ sub menuAyuda {
 }
 
 sub menuConsulta {
-	my ($opcionUno, @opcionDos, @opcionTres, $opcionCuatro, $opcionCinco, $opcionesTipeadas, @opcionesElegidas);
-	my ($flagUno, $flagDos, $flagTres, $flagCuatro, $flagCinco);
-	my ($desde, $hasta, $eligioOpcion);
-	$eligioOpcion = 0;
-	$flagUno = 0;
-	$flagDos = 0;
-	$flagTres = 0;
-	$flagCuatro = 0;
-	$flagCinco = 0;
-	while ($eligioOpcion != 1){
-		print "\n\t\tMenu de consulta\n\n";
-		print "Seleccione un filtro que desee aplicar, debe seleccionar almenos uno\n";
-		print "Filtrar por:\n";
-		print "1_Tipo de norma (todas, una)\n";
-		print "2_Año (todos, rango)\n";
-		print "3_Número de norma (todas, rango)\n";
-		print "4_Gestión (todas, una)\n";
-		print "5_Emisor (todos, uno)\n";
-		#Y aca el usuario escribe cuales quiere y lo meto en un array
-		$opcionesTipeadas = <STDIN>;
-		@opcionesElegidas = split(/\s/, $opcionesTipeadas);
-		#vuelve foreach, vamos foreach!
-		foreach $numerinSacado (@opcionesElegidas){
-			#perdon por la cascada de ifs si les molesta la puedo transformar en función
-			if ($numerinSacado == 1){
-				$flagUno = 1;
+	my ($opcionUno,@opcionDos,@opcionTres,$opcionCuatro,$opcionCinco);
+
+	($opcionUno,@opcionDos,@opcionTres,$opcionCuatro,$opcionCinco) = &setOptionValuesConsulta(&getflagsConsulta);
+
+	####Ahora que tengo todo debería mostrarle la data
+	my (@gestionDirectory, @gestionDirectoryAProcesar);
+	#TODO cambiar el hardcodeo
+	@gestionDirectory = `ls PROCDIR`;
+
+	if ($opcionCuatro ne ""){		
+		foreach (@gestionDirectory){
+			chomp ($_);
+			if ($_ eq $opcionCuatro){
+				@gestionDirectoryAProcesar = ($_);
 			}
-			else{
-				if ($numerinSacado == 2){
-					$flagDos = 1;
-				}
-				else{
-					if ($numerinSacado == 3){
-					$flagTres = 1;
-					}
-					else{
-						if ($numerinSacado == 4){
-							$flagCuatro = 1;
-						}
-						else{
-							if ($numerinSacado == 5){
-								$flagCinco =1;
-							}
-						}
-					}
-				}
-			}
-			#fin de la cascada, prometo no hacerlo de nuevo... o si?
-		}
-		#Veo que por lo menos haya elegido uno, sino se arma la podrida
-		if ($flagUno==1 or $flagDos==1 or $flagTres==1 or $flagCinco==1 or $flagCinco==1){
-			$eligioOpcion = 1;
 		}
 	}
+	else {
+		foreach (@gestionDirectory){
+			chomp ($_);
+			push (@gestionDirectoryAProcesar, $_);
+		}
+	}
+	#Aca tendria en @gestionDirectoryAProcesar todas las carpetas que quiero ver
+	if ($count_args == 1){
+		#ordenar los resultados cronológicamente desde la mas reciente hasta la mas antigüa
 
+	}
+
+	print "Mostrar data seleccionada:";
+	&menuPreguntaSiSeguirConsultando;
+}
+
+sub setOptionValuesConsulta {
+	my ($desde, $hasta);
+	my ($opcionUno,@opcionDos,@opcionTres,$opcionCuatro,$opcionCinco,@retval);
+	($flagUno, $flagDos, $flagTres, $flagCuatro, $flagCinco) = @_;
 	#Ahora pregunto que valor quiere por cada opción elegida
 	if ($flagUno){
 			print "\nElija un tipo de norma\n";
@@ -167,9 +156,64 @@ sub menuConsulta {
 		$opcionCinco = "";
 	}
 
-	####Ahora que tengo todo debería mostrarle la data
-	print "Mostrar data seleccionada:";
-	&menuPreguntaSiSeguirConsultando;
+	@retval = ($opcionUno,@opcionDos,@opcionTres,$opcionCuatro,$opcionCinco);
+}
+
+sub getflagsConsulta {
+	my ($eligioOpcion,$opcionesTipeadas, @opcionesElegidas, $flagUno,$flagDos, $flagTres, $flagCuatro, $flagCinco);
+	my(@retval);
+	$eligioOpcion = 0;
+	$flagUno = 0;
+	$flagDos = 0;
+	$flagTres = 0;
+	$flagCuatro = 0;
+	$flagCinco = 0;
+	while ($eligioOpcion != 1){
+		print "\n\t\tMenu de consulta\n\n";
+		print "Seleccione un filtro que desee aplicar, debe seleccionar almenos uno\n";
+		print "Filtrar por:\n";
+		print "1_Tipo de norma (todas, una)\n";
+		print "2_Año (todos, rango)\n";
+		print "3_Número de norma (todas, rango)\n";
+		print "4_Gestión (todas, una)\n";
+		print "5_Emisor (todos, uno)\n";
+		#Y aca el usuario escribe cuales quiere y lo meto en un array
+		$opcionesTipeadas = <STDIN>;
+		@opcionesElegidas = split(/\s/, $opcionesTipeadas);
+		#vuelve foreach, vamos foreach!
+		foreach $numerinSacado (@opcionesElegidas){
+			#perdon por la cascada de ifs si les molesta la puedo transformar en función
+			if ($numerinSacado == 1){
+				$flagUno = 1;
+			}
+			else{
+				if ($numerinSacado == 2){
+					$flagDos = 1;
+				}
+				else{
+					if ($numerinSacado == 3){
+					$flagTres = 1;
+					}
+					else{
+						if ($numerinSacado == 4){
+							$flagCuatro = 1;
+						}
+						else{
+							if ($numerinSacado == 5){
+								$flagCinco =1;
+							}
+						}
+					}
+				}
+			}
+			#fin de la cascada, prometo no hacerlo de nuevo... o si?
+		}
+		#Veo que por lo menos haya elegido uno, sino se arma la podrida
+		if ($flagUno==1 or $flagDos==1 or $flagTres==1 or $flagCuatro==1 or $flagCinco==1){
+			$eligioOpcion = 1;
+		}
+	}
+	@retval = ($flagUno,$flagDos,$flagTres,$flagCuatro,$flagCinco);
 }
 
 sub menuPreguntaSiSeguirConsultando {
