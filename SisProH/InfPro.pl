@@ -65,37 +65,75 @@ sub menuAyuda {
 }
 
 sub menuConsulta {
-	my ($opcionUno,@opcionDos,@opcionTres,$opcionCuatro,$opcionCinco);
+	&mostrarDataConsultas( &setOptionValuesConsulta(&getflagsConsulta) );	
+}
 
-	($opcionUno,@opcionDos,@opcionTres,$opcionCuatro,$opcionCinco) = &setOptionValuesConsulta(&getflagsConsulta);
-
-	####Ahora que tengo todo debería mostrarle la data
+sub mostrarDataConsultas {
+	my ($opcionUno,$opcionDosDesde,$opcionDosHasta,$opcionTresDesde,$opcionTresHasta,$opcionCuatro,$opcionCinco) = @_;
 	my (@gestionDirectory, @gestionDirectoryAProcesar);
-	#TODO cambiar el hardcodeo
-	@gestionDirectory = `ls PROCDIR`;
+	my ($currentDirToProcess);
+	my(@filesToProcess);
+	####Ahora que tengo todo debería mostrarle la data
 
-	if ($opcionCuatro ne ""){		
+	@filesToProcess = &applyFilterGestion($opcionCuatro);										#Opción Cuatro
+	@filesToProcess = &applyFilterEmisor($opcionCinco, @filesToProcess);						#Opción Cinco
+	@filesToProcess = &applyFilterYear($opcionDosDesde,$opcionDosHasta,@filesToProcess);		#Opción Dos
+#	@filesToProcess = &applyFilterCodigoNorma($opcionUno, @filesToProcess);						#Opción Uno
+#	@filesToProcess = &applyFilterNumeroNorma(@opcionTres, @filesToProcess);					#Opción Tres
+
+	&menuPreguntaSiSeguirConsultando;
+}
+
+sub applyFilterYear {
+	my ($yearsWantedFrom,$yearsWantedTo, @filesToProcess) = @_;
+	my (@retval, @filesWithTheYears, @partialFiles,@years,$year);
+
+	foreach (@filesToProcess){
+		@partialFiles = `ls $_`;
+		push(@filesWithTheYears,@partialFiles);
+	}
+	foreach (@filesWithTheYears){
+		chomp($_);
+		$year = `echo $_ | cut -d '.' -f 1`;	#el cut es para files		
+		push(@years,$year);
+	}
+
+}
+
+sub applyFilterEmisor {
+	($emisorWanted, @filesToProcess) = @_;
+	my (@retval);
+	#voy a ver si los directorios que me pasan contienen el filtro por emisor, si no lo contienen lo saco
+	foreach (@filesToProcess){
+		if (index($_, $emisorWanted) != -1) {
+	    	push (@retval, $_);
+		}
+	}
+	@retval;	#Devuelve cosas como PROCDIR/Fernandez2/
+}
+
+sub applyFilterGestion {
+	$gestionAFiltrar = $_;
+	my (@retval);
+	#TODO cambiar el hardcodeo
+	my (@gestionDirectory) = `ls PROCDIR`;
+	my ($baseDir) = "PROCDIR/";
+
+	if ($gestionAFiltrar ne ""){		
 		foreach (@gestionDirectory){
 			chomp ($_);
-			if ($_ eq $opcionCuatro){
-				@gestionDirectoryAProcesar = ($_);
+			if ($_ eq $gestionAFiltrar){
+				@retval = ("$baseDir$_/");
 			}
 		}
 	}
 	else {
 		foreach (@gestionDirectory){
 			chomp ($_);
-			push (@gestionDirectoryAProcesar, $_);
+			push (@retval, "$baseDir$_/");
 		}
 	}
-	#Aca tendria en @gestionDirectoryAProcesar todas las carpetas que quiero ver
-	if ($count_args == 1){
-		#ordenar los resultados cronológicamente desde la mas reciente hasta la mas antigüa
-
-	}
-
-	print "Mostrar data seleccionada:";
-	&menuPreguntaSiSeguirConsultando;
+	@retval;	#Devuelve cosas como PROCDIR/Fernandez2/
 }
 
 sub setOptionValuesConsulta {
@@ -131,7 +169,7 @@ sub setOptionValuesConsulta {
 		chomp($desde);
 		print "Hasta:\n";
 		$hasta = <STDIN>;
-		$hasta = <STDIN>;
+		chomp($hasta);
 		@opcionDos = ($desde, $hasta);
 	}
 	else{
