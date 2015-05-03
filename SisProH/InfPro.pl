@@ -86,18 +86,28 @@ sub mostrarDataConsultas {
 
 sub applyFilterYear {
 	my ($yearsWantedFrom,$yearsWantedTo, @filesToProcess) = @_;
-	my (@retval, @filesWithTheYears, @partialFiles,@years,$year);
+	my (@retval, @filesWithTheYears, @partialFiles,$year);
 
-	foreach (@filesToProcess){
-		@partialFiles = `ls $_`;
-		push(@filesWithTheYears,@partialFiles);
-	}
-	foreach (@filesWithTheYears){
-		chomp($_);
-		$year = `echo $_ | cut -d '.' -f 1`;	#el cut es para files		
-		push(@years,$year);
+	foreach $firstPartDir (@filesToProcess){
+		@partialFiles = `ls $firstPartDir`;
+		foreach $lastPartDir (@partialFiles){
+			$var = join('',$firstPartDir,$lastPartDir);
+			chomp ($var);
+			push( @completeDir,$var );
+		}		
+		push(@filesWithTheYears,@completeDir);
 	}
 
+	foreach $totalPath (@filesWithTheYears){
+		$year = `echo $totalPath | cut -d '/' -f 3`;	#el cut es para files
+		chomp($year);
+		$year = `echo $year | cut -d '.' -f 1`;
+		chomp($year);
+		if (($year >= $yearsWantedFrom) and ($year <=$yearsWantedTo)){
+			push (@retval, $totalPath);
+		}		
+	}
+	@retval;	#Acá ya voy devolviendo cosas como PROCDIR/Fernandez2/2007.WASD
 }
 
 sub applyFilterEmisor {
