@@ -60,69 +60,134 @@ sub menuAyuda {
 sub menuConsulta {
 	my ($opcionUno, @opcionDos, @opcionTres, $opcionCuatro, $opcionCinco, $opcionesTipeadas, @opcionesElegidas);
 	my ($flagUno, $flagDos, $flagTres, $flagCuatro, $flagCinco);
-	print "\n\t\tMenu de consulta\n\n";
-	print "Seleccione un filtro que desee aplicar, debe seleccionar almenos uno\n";
-	print "Filtrar por:\n";
-	print "1_Tipo de norma (todas, una)\n";
-	print "2_Año (todos, rango)\n";
-	print "3_Número de norma (todas, rango)\n";
-	print "4_Gestión (todas, una)\n";
-	print "5_Emisor (todos, uno)\n";
-	#Y aca el usuario escribe cuales quiere y lo meto en un array
-	$opcionesTipeadas = <STDIN>;
-	@opcionesElegidas = split(/\s/, $opcionesTipeadas);
-	#vuelve foreach, vamos foreach!
-	foreach $numerinSacado (@opcionesElegidas){
-		#perdon por la cascada de ifs si les molesta la puedo transformar en función
-		if ($numerinSacado == 1){
-			$flagUno = 1;
-		}
-		else{
-			if ($numerinSacado == 2){
-				$flagDos = 1;
+	my ($desde, $hasta, $eligioOpcion);
+	$eligioOpcion = 0;
+	$flagUno = 0;
+	$flagDos = 0;
+	$flagTres = 0;
+	$flagCuatro = 0;
+	$flagCinco = 0;
+	while ($eligioOpcion != 1){
+		print "\n\t\tMenu de consulta\n\n";
+		print "Seleccione un filtro que desee aplicar, debe seleccionar almenos uno\n";
+		print "Filtrar por:\n";
+		print "1_Tipo de norma (todas, una)\n";
+		print "2_Año (todos, rango)\n";
+		print "3_Número de norma (todas, rango)\n";
+		print "4_Gestión (todas, una)\n";
+		print "5_Emisor (todos, uno)\n";
+		#Y aca el usuario escribe cuales quiere y lo meto en un array
+		$opcionesTipeadas = <STDIN>;
+		@opcionesElegidas = split(/\s/, $opcionesTipeadas);
+		#vuelve foreach, vamos foreach!
+		foreach $numerinSacado (@opcionesElegidas){
+			#perdon por la cascada de ifs si les molesta la puedo transformar en función
+			if ($numerinSacado == 1){
+				$flagUno = 1;
 			}
 			else{
-				if ($numerinSacado == 3){
-				$flagTres = 1;
+				if ($numerinSacado == 2){
+					$flagDos = 1;
 				}
 				else{
-					if ($numerinSacado == 4){
-						$flagCuatro = 1;
+					if ($numerinSacado == 3){
+					$flagTres = 1;
 					}
 					else{
-						if ($numerinSacado == 5){
-							$flagCinco =1;
+						if ($numerinSacado == 4){
+							$flagCuatro = 1;
+						}
+						else{
+							if ($numerinSacado == 5){
+								$flagCinco =1;
+							}
 						}
 					}
 				}
 			}
+			#fin de la cascada, prometo no hacerlo de nuevo... o si?
 		}
-		#fin de la cascada, prometo no hacerlo de nuevo... o si?
+		#Veo que por lo menos haya elegido uno, sino se arma la podrida
+		if ($flagUno==1 or $flagDos==1 or $flagTres==1 or $flagCinco==1 or $flagCinco==1){
+			$eligioOpcion = 1;
+		}
 	}
+
 	#Ahora pregunto que valor quiere por cada opción elegida
 	if ($flagUno){
-		print "Filtro por tipo de norma:\n";
-		print "1_Todas\n";
-		print "2_Eliga una\n";
-		$opcionUsuario = <STDIN>;
-
-		while (1){
-			if ($opcionUsuario == 1 or $opcionUsuario ==2){				
-				last;
-			}
-			print "Filtro por tipo de norma:\n";
-			print "1_Todas\n";
-			print "2_Eliga una\n";
-			$opcionUsuario = <STDIN>;
-		}
-		if ($opcionUsuario == 2){
 			print "\nElija un tipo de norma\n";
 			$opcionUno = <STDIN>;
-		}		
+			chomp($opcionUno);
+	}
+	else {
+			$opcionUno = "";	#Que la linea vacia signifique todas
 	}
 
+	if ($flagDos){		
+		print "Desde:\n";
+		$desde = <STDIN>;
+		chomp($desde);
+		print "Hasta:\n";
+		$hasta = <STDIN>;
+		chomp($hasta);
+		@opcionDos = ($desde, $hasta);
+	}
+	else{
+			@opcionDos = (1810, 2100);	#Del año 1810 al 2100
+	}
 
-	
+	if ($flagTres){
+		print "Desde:\n";
+		$desde = <STDIN>;
+		chomp($desde);
+		print "Hasta:\n";
+		$hasta = <STDIN>;
+		$hasta = <STDIN>;
+		@opcionDos = ($desde, $hasta);
+	}
+	else{
+		@opcionTres = (0,9999);	#desde donde hasta donde van las normas?
+	}
+
+	if ($flagCuatro){
+		print "Escriba la gestión a buscar:\n";
+		$opcionCuatro = <STDIN>;
+		chomp($opcionCuatro);
+	}
+	else{
+		$opcionCuatro = "";
+	}
+
+	if ($flagCinco){
+		print "Escriba emisor a buscar:\n";
+		$opcionCinco = <STDIN>;
+		chomp($opcionCinco);
+	}
+	else{
+		$opcionCinco = "";
+	}
+
+	####Ahora que tengo todo debería mostrarle la data
+	print "Mostrar data seleccionada:";
+	&menuPreguntaSiSeguirConsultando;
+}
+
+sub menuPreguntaSiSeguirConsultando {
+	my($opcionElegida);
+
+	print "\n¿Desea realizar otra consulta?[S/N]\n";
+	$opcionElegida = <STDIN>;
+	$opcionElegida = uc $opcionElegida;
+	chomp($opcionElegida);
+	while($opcionElegida ne 'S' and $opcionElegida ne 'N'){		
+		print "\n¿Desea realizar otra consulta?[S/N]\n";
+		$opcionElegida = <STDIN>;
+		$opcionElegida = uc $opcionElegida;
+		chomp($opcionElegida);
+	}
+	if ($opcionElegida eq 'S'){
+		&menuConsulta;
+	}
 	exit;
 }
 
