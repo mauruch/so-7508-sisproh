@@ -11,6 +11,7 @@ carpetaAceptados="ACEPDIR"
 carpetaRechazados="RECHDIR"
 
 nombreScript=`basename "$0"`
+ciclo=0
 
 ### fin variables ###
 
@@ -137,9 +138,9 @@ function valFormatoNombreArch(){
 
 			if [ $cont -eq 1 ] || [ $cont -eq 2 ] || [ $cont -eq 3 ]
 			then
-				resultadoValidacion=`cut -d';' -f1 MAEDIR/$archivo | grep $validar | wc -l`
-				echo `cut -d';' -f1 MAEDIR/$archivo | grep $validar `
-				echo "resultado validacion: " $resultadoValidacion
+				nombreValido=`cut -d';' -f1 MAEDIR/$archivo | grep $validar';' | wc -l`
+				echo `cut -d';' -f1 MAEDIR/$archivo | grep $validar';' `
+				echo "resultado validacion: " $nombreValido
 			fi
 
 			nombre=${nombre#*_}
@@ -169,81 +170,89 @@ function valFormatoNombreArch(){
 
 ### fin funciones ###
 
-
 # Inicio de la ejecución del script
+function detectarArribos(){
 
-if [ $# -gt 1 ]
-then
-	echo "No se necesitan parametros para la ejecucion de RecPro, los mismos han sido ignorados"
-fi
-
- echo "$nombreScript"
-#PASO 1: Imprimo el log
-./Glog.sh "$nombreScript" "ciclo nro..."
-
-#PASO 2: Chequeo si hay archivos en NOVEDIR
-cantidadArchivos=`ls -1 "$carpetaNovedades" | wc -l`
-
-echo $cantidadArchivos
-
-if [ $cantidadArchivos -ge 1 ]
-then
-	# Procesar archivos.
-	for arch in `ls "$carpetaNovedades"`
-	do
-		echo 'procesando' $arch
-		valExtensionArch $arch
-		validacion=$?
-		echo $validacion
-		if [ $validacion -eq 1 ]
-		then
-		
-			#chequeo que el archivo no esté vacío
-			if [ -s $arch ]
-			then
-				valFormatoNombreArch $arch
-				validacion=$?
-				echo $validacion
-				if [ $validacion -eq 1 ]
-				then
-					echo "todo bien"
-					aceptarArch $arch 
-				else
-					echo "mover a rechazados"
-					rechazarArch $arch 
-				
-				fi
-			else
-				echo "mover a rechazados"
-				./Glog.sh  $nombreScript "El archivo $arch ha sido rechazado por: Archivo vacío"
-				rechazarArch $arch 
-			fi
-
-		else
-			echo "mover a rechazados"
-			./Glog.sh  $nombreScript "El archivo $arch ha sido rechazado por: Tipo Inválido"
-			rechazarArch $arch 
-
-		fi
-
-	done
-
-else
-    	echo "si no hay archivos ir al paso NOVEDADES PENDIENTES"
-	res=`ps -C "ProPro.sh" | wc -l `
-	#res cuenta una línea más a la cantidad de procesos
-	if [ $res -gt 1 ]
+	# Inicio de la ejecución del script
+	if [ $# -gt 1 ]
 	then
-		pid=`pgrep feprima.sh`
-		echo "ProPro ya corriendo bajo el no.: $pid"
-		./Glog.sh  $nombreScript "ProPro ya corriendo bajo el no.: $pid"
-	else
-		./ProPro.sh &
-		echo "ProPro corriendo bajo el no.: $!"
-		./Glog.sh  $nombreScript "ProPro corriendo bajo el no.: $!"
+		echo "No se necesitan parametros para la ejecucion de RecPro, los mismos han sido ignorados"
 	fi
 
+	 echo "$nombreScript"
+	#PASO 1: Imprimo el log
+	./Glog.sh "$nombreScript" "ciclo nro... $1"
+
+	#PASO 2: Chequeo si hay archivos en NOVEDIR
+	cantidadArchivos=`ls -1 "$carpetaNovedades" | wc -l`
+
+	echo $cantidadArchivos
+
+	if [ $cantidadArchivos -ge 1 ]
+	then
+		# Procesar archivos.
+		for arch in `ls "$carpetaNovedades"`
+		do
+			echo 'procesando' $arch
+			valExtensionArch $arch
+			validacion=$?
+			echo $validacion
+			if [ $validacion -eq 1 ]
+			then
+		
+				#chequeo que el archivo no esté vacío
+				if [ -s $carpetaNovedades/$arch ]
+				then
+					valFormatoNombreArch $arch
+					validacion=$?
+					echo $validacion
+					if [ $validacion -eq 1 ]
+					then
+						echo "todo bien"
+						aceptarArch $arch 
+					else
+						echo "mover a rechazados"
+						rechazarArch $arch 
+				
+					fi
+				else
+					echo "mover a rechazados"
+					./Glog.sh  $nombreScript "El archivo $arch ha sido rechazado por: Archivo vacío"
+					rechazarArch $arch 
+				fi
+
+			else
+				echo "mover a rechazados"
+				./Glog.sh  $nombreScript "El archivo $arch ha sido rechazado por: Tipo Inválido"
+				rechazarArch $arch 
+
+			fi
+
+		done
+
+	else
+	    	echo "si no hay archivos ir al paso NOVEDADES PENDIENTES"
+		res=`ps -C "ProPro.sh" | wc -l `
+		#res cuenta una línea más a la cantidad de procesos
+		if [ $res -gt 1 ]
+		then
+			pid=`pgrep feprima.sh`
+			echo "ProPro ya corriendo bajo el no.: $pid"
+			./Glog.sh  $nombreScript "ProPro ya corriendo bajo el no.: $pid"
+		else
+			./ProPro.sh &
+			echo "ProPro corriendo bajo el no.: $!"
+			./Glog.sh  $nombreScript "ProPro corriendo bajo el no.: $!"
+		fi
+
+		#sleep 10
+
+	
+	fi
+}
+
+while :;do
+	let ciclo=$ciclo+1
+ 	detectarArribos $ciclo
 	sleep 60
-
-
-fi
+done
