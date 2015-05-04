@@ -6,15 +6,12 @@
 ### Variables ###
 ## NOTA: HAY QUE AJUSTAR LAS CARPETAS
 
-<<<<<<< HEAD
+
 carpetaNovedades= $NOVEDIR
 carpetaAceptados= $ACEPDIR
 carpetaRechazados=$RECHDIR
-=======
-carpetaNovedades="NOVEDIR"
-carpetaAceptados="ACEPDIR"
-carpetaRechazados="RECHDIR"
->>>>>>> refs/remotes/origin/master
+
+
 DORMIR_RECPRO=60
 
 nombreScript=`basename "$0"`

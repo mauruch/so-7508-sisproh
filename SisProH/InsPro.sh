@@ -76,7 +76,6 @@ for (( i=0;i<11;i++)); do
 done 
 }
 
-<<<<<<< HEAD
 #->FUNCION: Inicializar el archivo de log----------------------------------------------------------------------#
 #    Se utiliza el archivo InsPro.log
 #  1->Si el archivo no existe lo creo
@@ -114,8 +113,6 @@ function f_inicializar_log ()
 	return 0
 }
 
-=======
->>>>>>> refs/remotes/origin/master
 #######################################
 
 #PRINCIPAL
@@ -125,15 +122,10 @@ function f_inicializar_log ()
 
 
 msgHeader="TP SO7508 Primer Cuatrimestre 2015. Tema H Copyright © Grupo 06"
-<<<<<<< HEAD
 f_inicializar_log
-=======
-
->>>>>>> refs/remotes/origin/master
 #checkeo si esta instalado
 #checkInstallation
 
-<<<<<<< HEAD
 
 #######Luis: No se puede hacer touch porque creamos los directorios luego, es decir, el directorio de LOG y Conf no existe
 #######Luis: Agrego modificacion para que los directorios se creen ni bien el usuario los ingresa 
@@ -164,43 +156,10 @@ if perl < /dev/null > /dev/null 2>&1  ; then
 	fi
 else
     echo -e "Para instalar el TP es necesario contar con Perl 5 o superior. Efectúe su instalación e inténtelo nuevamente. \n Proceso de 		Instalación Cancelado"
-=======
-#se crea el log de la instalacion
-insproConf="$CONFDIR/InsPro.conf"
-insproLog="$CONFDIR/InsPro.log"
-if [ ! -f $insproLog ]; then
-    touch $insproLog
-else 
-	echo "checkeando instalación"
-#	bash checkSisProIns.sh
->>>>>>> refs/remotes/origin/master
 fi
 
-<<<<<<< HEAD
 
  
-=======
-####### 5. Chequear que Perl esté instalado #########
-
-if perl < /dev/null > /dev/null 2>&1  ; then
-	#checkear version
-	perlResult=`perl -v | grep 'perl 5'`
-	if [ "$perlResult" != "" ]; then
-		echo -e "$msgHeader \n"	
-		echo "Perl Version: `perl -v`"
-		echo -e "\n"
-	else
-		echo -e "Para instalar el TP es necesario contar con Perl 5 o superior. Efectúe su instalación e inténtelo nuevamente. \n Proceso de 			Instalación Cancelado"
-	fi
-else
-    echo -e "Para instalar el TP es necesario contar con Perl 5 o superior. Efectúe su instalación e inténtelo nuevamente. \n Proceso de 		Instalación Cancelado"
-fi
-
-#sh Glog.sh "InsPro.sh" "Inicio de la Ejecución de InsPro" "INFO"
-#sh Glog.sh "InsPro.sh" "Directorio predefinido de Configuracion: $CONFDIR" "INFO"
-#sh Glog.sh "InsPro.sh" "Log de la instalación: $insproLog" "INFO"
-
->>>>>>> refs/remotes/origin/master
 array_key=( "BINDIR" "MAEDIR" "NOVEDIR" "DATASIZE" "ACEPDIR" "RECHDIR" "PROCDIR" "INFODIR" "DUPDIR" "LOGDIR" "LOGSIZE" )
 
 array_value=( "el directorio para los ejecutables" "el directorio para los maestros y tablas" "el directorio de recepcion de documentos para la protocolizacion" "espacio mínimo libre para el arribo de estas novedades en Mbytes" "el directorio de grabación de las Novedades aceptadas" "el directorio de grabación de archivos rechazados" "el directorio de grabación de los documentos protocolizados" "el directorio de grabación de los informes de salida" "el nombre para el repositorio de archivos duplicados" "el directorio de logs" "el tamaño máximo para cada archivo de log en Kbytes" )
@@ -259,9 +218,6 @@ echo "Iniciando Instalación. Esta Ud. seguro? (s/n)"
 read confirmInstall
 
 echo -e "\n"
-
-
-######## 20. Instalación #################
 
 
 ######## 20. Instalación #################
@@ -344,14 +300,10 @@ echo -e "Actualizando la configuración del sistema \n"
 for (( i=0;i<11;i++)); do
 	k="${array_key[$i]}"
 	eval finalDir=\${"$k"}
-<<<<<<< HEAD
 	chmod +w $insproConf
 	echo "$k=$finalDir" >> $insproConf
 	
 	
-=======
-	echo "$k=$finalDir" >> $insproConf
->>>>>>> refs/remotes/origin/master
 done
 
 ###### FIN ###########
