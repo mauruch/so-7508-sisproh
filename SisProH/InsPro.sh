@@ -63,7 +63,7 @@ for (( i=0;i<11;i++)); do
 	fi
 
 	# se loguea la accion
-	sh Glog.sh "Se estableció $v: $k" "INFO"
+#	sh Glog.sh "Se estableció $v: $k" "INFO"
 
 done 
 }
@@ -85,9 +85,9 @@ else
 #	bash checkSisProIns.sh
 fi
 
-sh Glog.sh "Inicio de la Ejecución de InsPro" "INFO"
-sh Glog.sh "Directorio predefinido de Configuracion: $CONFDIR" "INFO"
-sh Glog.sh "Log de la instalación: $insproLog" "INFO"
+#sh Glog.sh "InsPro.sh" "Inicio de la Ejecución de InsPro" "INFO"
+#sh Glog.sh "InsPro.sh" "Directorio predefinido de Configuracion: $CONFDIR" "INFO"
+#sh Glog.sh "InsPro.sh" "Log de la instalación: $insproLog" "INFO"
 
 echo "** Bienvenido al sistema de Protocolizacion ** "
 echo "Lo ayudaremos en el proceso de instalacion del mismo..."
@@ -195,7 +195,7 @@ done
 echo -e "Instalando Programas y Funciones \n"
 lsScriptsResult=`ls | grep '\.sh$'`
 currentDirectory=`pwd`
-for f in $lsScriptsResult; docl
+for f in $lsScriptsResult; do
   bash Mover.sh "$currentDirectory/$f" "$BINDIR" "InsPro.sh"
 done
 
