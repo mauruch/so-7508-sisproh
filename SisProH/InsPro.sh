@@ -1,7 +1,7 @@
 #Comando de instalacion
 
 export insproLog="InsPro.log"
-export GRUPO=$HOME/Sisop2015/so-7508-sisproh/Instalacion
+export GRUPO=$HOME/Instalacion
 export CONFDIR="$GRUPO/conf"
 
 #Lo primero que vamos a hacer sería decirle a todos los scripts que son ejecutables
@@ -114,15 +114,16 @@ function f_inicializar_log ()
 }
 
 #######################################
-
 #PRINCIPAL
-#######################LUIS
-#export GRUPO=/home/paulo/so-7508-sisproh/Instalacion
-############################
+
 
 
 msgHeader="TP SO7508 Primer Cuatrimestre 2015. Tema H Copyright © Grupo 06"
+
+##Inicializo Log
 f_inicializar_log
+
+
 #checkeo si esta instalado
 #checkInstallation
 
@@ -224,9 +225,7 @@ echo -e "\n"
 
 if [ "$confirmInstall" = "s" ]; then
 	echo "Creando Estructuras de directorio...."
-##############LUIS############
-	
-#############################
+
 	for (( i=0;i<11;i++)); do
 		k="${array_key[$i]}"
 		eval finalDir=\${"$k"}
@@ -273,16 +272,16 @@ dataDir="2015-1C-Datos/"
 lsMaeResult=`ls $dataDir | grep '\.mae$'`
 	
 for f in $lsMaeResult; do
-	echo -e "moviendo Mae"
-	#bash Mover.sh "$dataDir$f" "$MAEDIR" "InsPro.sh"
+	
+	bash Mover.sh "$dataDir$f" "$MAEDIR" "InsPro.sh"
 done
 
 ###### 20.2  Se mueven los archivos tablas #######
 lsTabResult=`ls $dataDir | grep '\.tab$'`
 
 for f in $lsTabResult; do
-	echo -e "moviendo Tab"	
-  #bash Mover.sh "$dataDir$f" "$MAEDIR/tab" "InsPro.sh"
+	
+  bash Mover.sh "$dataDir$f" "$MAEDIR/tab" "InsPro.sh"
 done
 
 ###### 20.3 Mover los ejecutables y funciones  #######
@@ -290,8 +289,7 @@ echo -e "Instalando Programas y Funciones \n"
 lsScriptsResult=`ls | grep '\.sh$'`
 currentDirectory=`pwd`
 for f in $lsScriptsResult; do
-  echo -e "No mover nada al bin"
-  #bash Mover.sh "$currentDirectory/$f" "$BINDIR" "InsPro.sh"
+  bash Mover.sh "$currentDirectory/$f" "$BINDIR" "InsPro.sh"
 done
 
 ###### 20.4 Actualizar el archivo de configuración  #######
