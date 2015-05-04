@@ -72,16 +72,55 @@ sub mostrarDataConsultas {
 	my ($opcionUno,$opcionDosDesde,$opcionDosHasta,$opcionTresDesde,$opcionTresHasta,$opcionCuatro,$opcionCinco) = @_;
 	my (@gestionDirectory, @gestionDirectoryAProcesar);
 	my ($currentDirToProcess);
-	my(@filesToProcess);
+	my(@filesToProcess, @filteredData);
 	####Ahora que tengo todo debería mostrarle la data
-
-	@filesToProcess = &applyFilterGestion($opcionCuatro);										#Opción Cuatro
-	@filesToProcess = &applyFilterEmisor($opcionCinco, @filesToProcess);						#Opción Cinco
-	@filesToProcess = &applyFilterYear($opcionDosDesde,$opcionDosHasta,@filesToProcess);		#Opción Dos
-#	@filesToProcess = &applyFilterCodigoNorma($opcionUno, @filesToProcess);						#Opción Uno
-#	@filesToProcess = &applyFilterNumeroNorma(@opcionTres, @filesToProcess);					#Opción Tres
+	@filesToProcess = &applyFilterGestion($opcionCuatro);											#Opción Cuatro
+	@filesToProcess = &applyFilterEmisor($opcionCinco, @filesToProcess);							#Opción Cinco
+	@filesToProcess = &applyFilterYear($opcionDosDesde,$opcionDosHasta,@filesToProcess);			#Opción Dos
+	@filesToProcess = &applyFilterCodigoNorma($opcionUno, @filesToProcess);							#Opción Uno
+	@filteredData = &applyFilterNumeroNorma($opcionTresDesde,$opcionTresHasta,@filesToProcess);	#Opción Tres
 
 	&menuPreguntaSiSeguirConsultando;
+}
+
+sub applyFilterNumeroNorma {
+	#acá ya me voy a tener que meter adentro del archivo
+	my ($numeroNormaDesde,$numeroNormaHasta,@filesToProcess) = @_;
+	my (@retval);
+
+	if ($opcionTresDesde == -1){
+		foreach (@filesToProcess){
+			push (@retval,`cat $_`);
+		}
+		return (@retval);
+	}
+	else{
+		foreach (@filesToProcess){			
+			$numeroDeNormaSacado = `cut -d ';' -f 3 $_`;
+			print "$numeroDeNormaSacado";
+		}
+	}
+}
+
+sub applyFilterCodigoNorma {
+	my ($normaFilter, @filesToProcess) = @_;
+	my (@retval,$norma);
+
+	if ($normaFilter eq ""){
+		#significa que no tendré que filtrar nada
+		return (@filesToProcess);
+	}
+
+	foreach $totalPath (@filesToProcess){
+		$norma = `echo $totalPath | cut -d '/' -f 3`;	#el cut es para files
+		chomp($norma);		
+		$norma = `echo $norma | cut -d '.' -f 2`;
+		chomp($norma);
+		if (index($norma, $normaFilter) != -1){
+			push (@retval, $totalPath);
+		}
+	}
+	@retval;
 }
 
 sub applyFilterYear {
@@ -183,7 +222,7 @@ sub setOptionValuesConsulta {
 		@opcionDos = ($desde, $hasta);
 	}
 	else{
-		@opcionTres = (0,9999);	#desde donde hasta donde van las normas?
+		@opcionTres = (-1,-1);	#Como para que elija todas
 	}
 
 	if ($flagCuatro){
