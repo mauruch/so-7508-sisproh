@@ -78,7 +78,7 @@ sub mostrarDataConsultas {
 	@filesToProcess = &applyFilterEmisor($opcionCinco, @filesToProcess);							#Opción Cinco
 	@filesToProcess = &applyFilterYear($opcionDosDesde,$opcionDosHasta,@filesToProcess);			#Opción Dos
 	@filesToProcess = &applyFilterCodigoNorma($opcionUno, @filesToProcess);							#Opción Uno
-	@filteredData = &applyFilterNumeroNorma($opcionTresDesde,$opcionTresHasta,@filesToProcess);	#Opción Tres
+	@filteredData = &applyFilterNumeroNorma($opcionTresDesde,$opcionTresHasta,@filesToProcess);		#Opción Tres
 
 	&menuPreguntaSiSeguirConsultando;
 }
@@ -88,10 +88,10 @@ sub applyFilterNumeroNorma {
 	my ($numeroNormaDesde,$numeroNormaHasta,@filesToProcess) = @_;
 	my (@retval);
 
-	if ($opcionTresDesde == -1){
+	if ($numeroNormaDesde == -1){
 		foreach (@filesToProcess){
 			push (@retval,`cat $_`);
-		}
+		}		
 		return (@retval);
 	}
 	else{
@@ -128,12 +128,13 @@ sub applyFilterYear {
 	my (@retval, @filesWithTheYears, @partialFiles,$year);
 
 	foreach $firstPartDir (@filesToProcess){
+		my (@completeDir);	#como para que se resetee
 		@partialFiles = `ls $firstPartDir`;
-		foreach $lastPartDir (@partialFiles){
+		foreach $lastPartDir (@partialFiles){			
 			$var = join('',$firstPartDir,$lastPartDir);
 			chomp ($var);
 			push( @completeDir,$var );
-		}		
+		}
 		push(@filesWithTheYears,@completeDir);
 	}
 
@@ -191,7 +192,8 @@ sub setOptionValuesConsulta {
 	($flagUno, $flagDos, $flagTres, $flagCuatro, $flagCinco) = @_;
 	#Ahora pregunto que valor quiere por cada opción elegida
 	if ($flagUno){
-			print "\nElija un tipo de norma\n";
+			print "Elija un tipo de norma\n";
+			print ">";
 			$opcionUno = <STDIN>;
 			chomp($opcionUno);
 	}
@@ -201,9 +203,11 @@ sub setOptionValuesConsulta {
 
 	if ($flagDos){		
 		print "Desde:\n";
+		print ">";
 		$desde = <STDIN>;
 		chomp($desde);
 		print "Hasta:\n";
+		print ">";
 		$hasta = <STDIN>;
 		chomp($hasta);
 		@opcionDos = ($desde, $hasta);
@@ -214,9 +218,11 @@ sub setOptionValuesConsulta {
 
 	if ($flagTres){
 		print "Desde:\n";
+		print ">";
 		$desde = <STDIN>;
 		chomp($desde);
 		print "Hasta:\n";
+		print ">";
 		$hasta = <STDIN>;
 		chomp($hasta);
 		@opcionDos = ($desde, $hasta);
@@ -227,6 +233,7 @@ sub setOptionValuesConsulta {
 
 	if ($flagCuatro){
 		print "Escriba la gestión a buscar:\n";
+		print ">";
 		$opcionCuatro = <STDIN>;
 		chomp($opcionCuatro);
 	}
@@ -236,6 +243,7 @@ sub setOptionValuesConsulta {
 
 	if ($flagCinco){
 		print "Escriba emisor a buscar:\n";
+		print ">";
 		$opcionCinco = <STDIN>;
 		chomp($opcionCinco);
 	}
@@ -264,6 +272,7 @@ sub getflagsConsulta {
 		print "3_Número de norma (todas, rango)\n";
 		print "4_Gestión (todas, una)\n";
 		print "5_Emisor (todos, uno)\n";
+		print ">";
 		#Y aca el usuario escribe cuales quiere y lo meto en un array
 		$opcionesTipeadas = <STDIN>;
 		@opcionesElegidas = split(/\s/, $opcionesTipeadas);
@@ -306,7 +315,7 @@ sub getflagsConsulta {
 sub menuPreguntaSiSeguirConsultando {
 	my($opcionElegida);
 
-	print "\n¿Desea realizar otra consulta?[S/N]\n";
+	print "¿Desea realizar otra consulta?[S/N]\n";
 	$opcionElegida = <STDIN>;
 	$opcionElegida = uc $opcionElegida;
 	chomp($opcionElegida);
