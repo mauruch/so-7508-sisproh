@@ -98,7 +98,7 @@ else
 	COUNTERMIDDLE=0
 	COUNTERFIRST=0
 	#TODO Esta direccion tiene que venir de algun lado, variable de entorno padre, al llamar o algo
-	DUPLICATEDDIRECTORY='DUPDIR'
+	DUPLICATEDDIRECTORY=$DUPDIR
 	##############################################################################################
 	DUPLICATEDDIRECTORYDESTINY="$DUPLICATEDDIRECTORY""/""$ORIGENFILE"".""$COUNTERFIRST""$COUNTERMIDDLE""$COUNTERLAST"
 	#Me fijo si ya existe uno con esos

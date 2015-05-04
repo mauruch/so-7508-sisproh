@@ -13,7 +13,7 @@ nombreScript=`basename "$0"`
 BIN_DIR='/home/paulo/Escritorio/SisProH'
 TRUE=0
 FALSE=0
-#direccion del archivo Glog.sh
+#direccion del arc hivo Glog.sh
 #Glog=$LIB_DIR/Glog.sh
 
 Glog=$BIN_DIR/Glog.sh
