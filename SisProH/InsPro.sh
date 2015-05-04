@@ -175,7 +175,7 @@ echo -e "Instalando Archivos Maestros y Tablas \n"
 
 #Mover los archivos maestros a MAEDIR y las tablas al directorio MAEDIR/tab
 
-dataDir="20115-1C-Datos/"
+dataDir="2015-1C-Datos/"
 
 #Se mueven los archivos maestros
 lsMaeResult=`ls $dataDir | grep '\.mae$'`
