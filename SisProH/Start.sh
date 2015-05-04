@@ -1,3 +1,5 @@
+#!/bin/bash
+
 #Shell script para disparar procesos
 
 # Descripcion: Comando que inicia la ejecucion del demonio 'RecPro'.
@@ -6,29 +8,28 @@
 
 ### Variables ###
 ## NOTA: HAY QUE AJUSTAR LAS CARPETAS
-###$LIB_DIR definir en archivo de configuracion
 ###$BIN_DIR es la carpeta de archivos principal donde esta RecPro por ejemplo
+
 nombreScript=`basename "$0"`
-#basename $0 te devuelve el nombre del archivo, en este caso Start.sh
-BIN_DIR='/home/paulo/Escritorio/SisProH'
+#BIN_DIR='/home/paulo/Escritorio/SisProH'
 TRUE=0
 FALSE=0
-#direccion del arc hivo Glog.sh
-#Glog=$LIB_DIR/Glog.sh
+#direccion del archivo Glog.sh
+#Glog=$BINDIR/Glog.sh
 
 Glog=$BIN_DIR/Glog.sh
 
-#	sePuedeEjecutar()
-#	{
-#
-#		if ! [ -f $Glog ]; then   #Si el archivo Glog no existe....
-#		echo "No se puede ejecutar: primero se debe ejecutar IniPro.sh"
-#		echo ""
-#		exit 1
-#		fi
-#
+	sePuedeEjecutar()
+	{
 
-#	}
+		if ! [ -f $Glog ]; then   #Si el archivo Glog no existe....
+		echo "No se puede ejecutar: primero se debe ejecutar IniPro.sh"
+		echo ""
+		exit 1
+		fi
+
+
+	}
 
 # Funcion que devuelve TRUE si RecPro esta corriendo, FALSE en caso contrario
 
@@ -52,5 +53,5 @@ esta_corriendo() {
                         fi
                 fi
 		}
-#sePuedeEjecutar
+sePuedeEjecutar
 esta_corriendo
