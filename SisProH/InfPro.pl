@@ -87,7 +87,7 @@ sub applyFilterNumeroNorma {
 	#acá ya me voy a tener que meter adentro del archivo
 	my ($numeroNormaDesde,$numeroNormaHasta,@filesToProcess) = @_;
 	my (@retval);
-
+	print "$numeroNormaDesde";
 	if ($numeroNormaDesde == -1){
 		foreach (@filesToProcess){
 			push (@retval,`cat $_`);
@@ -97,6 +97,7 @@ sub applyFilterNumeroNorma {
 	else{
 		foreach (@filesToProcess){			
 			$numeroDeNormaSacado = `cut -d ';' -f 3 $_`;
+			#TODO falta aca
 			print "$numeroDeNormaSacado";
 		}
 	}
@@ -202,11 +203,11 @@ sub setOptionValuesConsulta {
 	}
 
 	if ($flagDos){		
-		print "Desde:\n";
+		print "Año desde:\n";
 		print ">";
 		$desde = <STDIN>;
 		chomp($desde);
-		print "Hasta:\n";
+		print "Año hasta:\n";
 		print ">";
 		$hasta = <STDIN>;
 		chomp($hasta);
@@ -217,15 +218,15 @@ sub setOptionValuesConsulta {
 	}
 
 	if ($flagTres){
-		print "Desde:\n";
+		print "Número de norma desde:\n";
 		print ">";
 		$desde = <STDIN>;
 		chomp($desde);
-		print "Hasta:\n";
+		print "Número de norma hasta:\n";
 		print ">";
 		$hasta = <STDIN>;
 		chomp($hasta);
-		@opcionDos = ($desde, $hasta);
+		@opcionTres = ($desde, $hasta);
 	}
 	else{
 		@opcionTres = (-1,-1);	#Como para que elija todas
@@ -251,7 +252,7 @@ sub setOptionValuesConsulta {
 		$opcionCinco = "";
 	}
 
-	@retval = ($opcionUno,@opcionDos,@opcionTres,$opcionCuatro,$opcionCinco);
+	@retval = ($opcionUno,$opcionDos[0],$opcionDos[1],$opcionTres[0],$opcionTres[1],$opcionCuatro,$opcionCinco);
 }
 
 sub getflagsConsulta {
