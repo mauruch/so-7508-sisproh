@@ -79,6 +79,8 @@ done
 export GRUPO=/home/mauro/developer/grupo06
 export CONFDIR="$GRUPO/conf"
 
+msgHeader="TP SO7508 Primer Cuatrimestre 2015. Tema H Copyright © Grupo 06"
+
 #checkeo si esta instalado
 #checkInstallation
 
@@ -90,6 +92,22 @@ if [ ! -f $insproLog ]; then
 else 
 	echo "checkeando instalación"
 #	bash checkSisProIns.sh
+fi
+
+####### 5. Chequear que Perl esté instalado #########
+
+if perl < /dev/null > /dev/null 2>&1  ; then
+	#checkear version
+	perlResult=`perl -v | grep 'perl 5'`
+	if [ "$perlResult" != "" ]; then
+		echo -e "$msgHeader \n"	
+		echo "Perl Version: `perl -v`"
+		echo -e "\n"
+	else
+		echo -e "Para instalar el TP es necesario contar con Perl 5 o superior. Efectúe su instalación e inténtelo nuevamente. \n Proceso de 			Instalación Cancelado"
+	fi
+else
+    echo -e "Para instalar el TP es necesario contar con Perl 5 o superior. Efectúe su instalación e inténtelo nuevamente. \n Proceso de 		Instalación Cancelado"
 fi
 
 #sh Glog.sh "InsPro.sh" "Inicio de la Ejecución de InsPro" "INFO"
@@ -216,7 +234,7 @@ for (( i=0;i<11;i++)); do
 	echo "$k=$finalDir" >> $insproConf
 done
 
-###### FIN ###########3
+###### FIN ###########
 echo "Instalación CONCLUIDA"
 
 #instalacion exitosa
