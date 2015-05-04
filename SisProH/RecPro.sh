@@ -253,9 +253,8 @@ function detectarArribos(){
 
 	else
 	    	#si no hay archivos ir al paso NOVEDADES PENDIENTES"
-		res=`ps -C "ProPro.sh" | wc -l `
-		#res cuenta una línea más a la cantidad de procesos
-		if [ $res -gt 1 ]
+		res=`ps -A | grep 'ProPro.sh' | wc -l`
+		if [ $res -gt 0 ]
 		then
 			pid=`pgrep feprima.sh`
 			./Glog.sh  $nombreScript "ProPro ya corriendo bajo el no.: $pid"
@@ -270,8 +269,14 @@ function detectarArribos(){
 	fi
 }
 
-while :;do
-	let ciclo=$ciclo+1
- 	detectarArribos $ciclo
-	sleep $DORMIR_RECPRO
-done
+res=`ps -A | grep 'RecPro.sh' | wc -l`
+#res cuenta una línea más a la cantidad de procesos
+if [ $res -gt 1 ]
+then
+	while :;do
+		let ciclo=$ciclo+1
+		detectarArribos $ciclo
+		sleep $DORMIR_RECPRO
+	
+	done
+fi
