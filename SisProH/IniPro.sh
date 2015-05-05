@@ -6,6 +6,10 @@ INSPROCONF="$CONFDIR/InsPro.conf"
 chmod +x $GRUPO/Glog.sh
 chmod +rw $INSPROCONF
 
+LOGDIR=$(grep "LOGDIR" "$INSPROCONF")
+export $LOGDIR
+
+
 ################################################################################################
 ################ VERIFICO SI LAS VARIABLES DE AMBIENTE YA ESTAN SETEADAS  ######################
 ################################################################################################
@@ -26,7 +30,7 @@ for (( i=0;i<$elements;i++ )); do
 done
 if [ $continuo_proceso_iniPro = "false" ]; then
 	echo "Ambiente ya inicializado, si quiere reiniciar termine su sesión e ingrese nuevamente"
-	$GRUPO/Glog.sh "$0" 'Ambiente ya inicializado, si quiere reiniciar termine su sesión e ingrese nuevamente' 'ERR'
+	$GRUPO/Glog.sh "IniPro.sh" 'Ambiente ya inicializado, si quiere reiniciar termine su sesión e ingrese nuevamente' 'ERR'
 	exit 1
 fi
 ################################################################################################
@@ -38,51 +42,57 @@ fi
 ################################## SETEO VARIABLES DE ENTORNO  #################################
 ################################################################################################
 
+#MOSTRAR, LOGUEAR Y EXPORTAR VARIABLE LOGDIR Y SUS ARCHIVOS
+echo "Expotando variable LOGDIR -> $LOGDIR"
+$GRUPO/Glog.sh "IniPro.sh" "Expotando variable LOGDIR -> $LOGDIR" 'INFO'
+
 #MOSTRAR, LOGUEAR Y EXPORTAR VARIABLE BINDIR Y SUS ARCHIVOS
 BINDIR=$(grep "BINDIR" "$INSPROCONF")
 echo "Expotando variable BINDIR -> $BINDIR"
 export $BINDIR
+$GRUPO/Glog.sh "IniPro.sh" "Expotando variable BINDIR -> $BINDIR" 'INFO'
 
 #MOSTRAR, LOGUEAR Y EXPORTAR VARIABLE MAEDIR Y SUS ARCHIVOS
 MAEDIR=$(grep "MAEDIR" "$INSPROCONF")
 echo "Expotando variable MAEDIR -> $MAEDIR"
 export $MAEDIR
+$GRUPO/Glog.sh "IniPro.sh" "Expotando variable MAEDIR -> $MAEDIR" 'INFO'
 
 #MOSTRAR, LOGUEAR Y EXPORTAR VARIABLE NOVEDIR
 NOVEDIR=$(grep "NOVEDIR" "$INSPROCONF")
 echo "Expotando variable NOVEDIR -> $NOVEDIR"
 export $NOVEDIR
+$GRUPO/Glog.sh "IniPro.sh" "Expotando variable NOVEDIR -> $NOVEDIR" 'INFO'
 
 #MOSTRAR, LOGUEAR Y EXPORTAR VARIABLE ACEPDIR
 ACEPDIR=$(grep "ACEPDIR" "$INSPROCONF")
 echo "Expotando variable ACEPDIR -> $ACEPDIR"
 export $ACEPDIR
+$GRUPO/Glog.sh "IniPro.sh" "Expotando variable ACEPDIR -> $ACEPDIR" 'INFO'
 
 #MOSTRAR, LOGUEAR Y EXPORTAR VARIABLE RECHDIR
 RECHDIR=$(grep "RECHDIR" "$INSPROCONF")
 echo "Expotando variable RECHDIR -> $RECHDIR"
 export $RECHDIR
+$GRUPO/Glog.sh "IniPro.sh" "Expotando variable RECHDIR -> $RECHDIR" 'INFO'
 
 #MOSTRAR, LOGUEAR Y EXPORTAR VARIABLE PROCDIR
 PROCDIR=$(grep "PROCDIR" "$INSPROCONF")
 echo "Expotando variable PROCDIR -> $PROCDIR"
 export $PROCDIR
+$GRUPO/Glog.sh "IniPro.sh" "Expotando variable PROCDIR -> $PROCDIR" 'INFO'
 
 #MOSTRAR, LOGUEAR Y EXPORTAR VARIABLE INFODIR
 INFODIR=$(grep "INFODIR" "$INSPROCONF")
 echo "Expotando variable INFODIR -> $INFODIR"
 export $INFODIR
+$GRUPO/Glog.sh "IniPro.sh" "Expotando variable INFODIR -> $INFODIR" 'INFO'
 
 #MOSTRAR, LOGUEAR Y EXPORTAR VARIABLE DUPDIR
 DUPDIR=$(grep "DUPDIR" "$INSPROCONF")
 echo "Expotando variable DUPDIR -> $DUPDIR"
 export $DUPDIR
-
-#MOSTRAR, LOGUEAR Y EXPORTAR VARIABLE LOGDIR Y SUS ARCHIVOS
-LOGDIR=$(grep "LOGDIR" "$INSPROCONF")
-echo "Expotando variable LOGDIR -> $LOGDIR"
-export $LOGDIR
-
+$GRUPO/Glog.sh "IniPro.sh" "Expotando variable DUPDIR -> $DUPDIR" 'INFO'
 
 array_key=( "$CONFDIR" "$BINDIR" "$MAEDIR" "$NOVEDIR" "$ACEPDIR" "$RECHDIR" "$PROCDIR" "$INFODIR" "$DUPDIR" "$LOGDIR" )
 
@@ -95,10 +105,12 @@ for (( i=0;i<$elements;i++ )); do
 	KEY=${array_key[${i}]}
 
 	echo -e "${array_value[${i}]}: $KEY"
+	$GRUPO/Glog.sh "IniPro.sh" "${array_value[${i}]}: $KEY" 'INFO'
 
 	#listar los archivos cuando es necesario 
 	if [ "$KEY" = "$CONFDIR" ] || [ "$KEY" = "$BINDIR" ] || [ "$KEY" = "$MAEDIR" ]	|| [ "$KEY" = "$LOGDIR" ] ; then
 		ls "$KEY"
+		$GRUPO/Glog.sh "IniPro.sh" "$(ls "$KEY")" 'INFO'
 	fi
 	
 done
@@ -127,12 +139,12 @@ VERIFYAXG="$MAEDIR""/tab/axg.tab"
 if [ ! -f "$VERIFYRECPRO" ]
 then
 	echo "No existe el script $VERIFYRECPRO, es necesario ejecutar el instalador InsPro.sh previamente"
-	$GRUPO/Glog.sh "$0" "No existe el script $VERIFYRECPRO, es necesario ejecutar el instalador InsPro.sh previamente" 'ERR'
+	$GRUPO/Glog.sh "IniPro.sh" "No existe el script $VERIFYRECPRO, es necesario ejecutar el instalador InsPro.sh previamente" 'ERR'
 	exit 1
 else
 	if [ ! -x "$VERIFYRECPRO" ]; then
 		echo "$VERIFYRECPRO no tiene permisos de ejecucion, se procede a setearselos"
-		$GRUPO/Glog.sh "$0" "$VERIFYRECPRO no tiene permisos de ejecucion, se procede a setearselos" 'INFO'
+		$GRUPO/Glog.sh "IniPro.sh" "$VERIFYRECPRO no tiene permisos de ejecucion, se procede a setearselos" 'INFO'
 		chmod +x "$VERIFYRECPRO"
 	fi
 fi
@@ -140,12 +152,12 @@ fi
 if [ ! -f "$VERIFYPROPRO" ]
 then
 	echo "No existe el script $VERIFYPROPRO, es necesario ejecutar el instalador InsPro.sh previamente"
-	$GRUPO/Glog.sh "$0" "No existe el script $VERIFYPROPRO, es necesario ejecutar el instalador InsPro.sh previamente" 'ERR'
+	$GRUPO/Glog.sh "IniPro.sh" "No existe el script $VERIFYPROPRO, es necesario ejecutar el instalador InsPro.sh previamente" 'ERR'
 	exit 1
 else
 	if [ ! -x "$VERIFYPROPRO" ]; then
 		echo "$VERIFYPROPRO no tiene permisos de ejecucion, se procede a setearselos"
-		$GRUPO/Glog.sh "$0" "$VERIFYPROPRO no tiene permisos de ejecucion, se procede a setearselos" 'INFO'
+		$GRUPO/Glog.sh "IniPro.sh" "$VERIFYPROPRO no tiene permisos de ejecucion, se procede a setearselos" 'INFO'
 		chmod +x "$VERIFYPROPRO"
 	fi
 fi
@@ -153,12 +165,12 @@ fi
 if [ ! -f "$VERIFYINFPRO" ]
 then
 	echo "No existe el perl script $VERIFYINFPRO, es necesario ejecutar el instalador InsPro.sh previamente"
-	$GRUPO/Glog.sh "$0" "No existe el script $VERIFYINFPRO, es necesario ejecutar el instalador InsPro.sh previamente" 'ERR'
+	$GRUPO/Glog.sh "IniPro.sh" "No existe el script $VERIFYINFPRO, es necesario ejecutar el instalador InsPro.sh previamente" 'ERR'
 	exit 1
 else
 	if [ ! -x "$VERIFYINFPRO" ]; then
 		echo "$VERIFYINFPRO no tiene permisos de ejecucion, se procede a setearselos"
-		$GRUPO/Glog.sh "$0" "$VERIFYINFPRO no tiene permisos de ejecucion, se procede a setearselos" 'INFO'
+		$GRUPO/Glog.sh "IniPro.sh" "$VERIFYINFPRO no tiene permisos de ejecucion, se procede a setearselos" 'INFO'
 		chmod +x "$VERIFYINFPRO"
 	fi
 fi
@@ -166,7 +178,7 @@ fi
 if [ ! -f "$VERIFYEMISORES" ]
 then
 	echo "No existe el archivo $VERIFYEMISORES, es necesario ejecutar el instalador InsPro.sh previamente"
-	$GRUPO/Glog.sh "$0" "No existe el archivo $VERIFYEMISORES, es necesario ejecutar el instalador InsPro.sh previamente" 'ERR'
+	$GRUPO/Glog.sh "IniPro.sh" "No existe el archivo $VERIFYEMISORES, es necesario ejecutar el instalador InsPro.sh previamente" 'ERR'
 	exit 1
 else
 	chmod +rw "$VERIFYEMISORES"
@@ -175,7 +187,7 @@ fi
 if [ ! -f "$VERIFYNORMAS" ]
 then
 	echo "No existe el archivo $VERIFYNORMAS, es necesario ejecutar el instalador InsPro.sh previamente"
-	$GRUPO/Glog.sh "$0" "No existe el archivo $VERIFYNORMAS, es necesario ejecutar el instalador InsPro.sh previamente" 'ERR'
+	$GRUPO/Glog.sh "IniPro.sh" "No existe el archivo $VERIFYNORMAS, es necesario ejecutar el instalador InsPro.sh previamente" 'ERR'
 	exit 1
 else
 	chmod +rw "$VERIFYNORMAS"
@@ -184,7 +196,7 @@ fi
 if [ ! -f "$VERIFYGESTIONES" ]
 then
 	echo "No existe el archivo $VERIFYGESTIONES, es necesario ejecutar el instalador InsPro.sh previamente"
-	$GRUPO/Glog.sh "$0" "No existe el archivo $VERIFYGESTIONES, es necesario ejecutar el instalador InsPro.sh previamente" 'ERR'
+	$GRUPO/Glog.sh "IniPro.sh" "No existe el archivo $VERIFYGESTIONES, es necesario ejecutar el instalador InsPro.sh previamente" 'ERR'
 	exit 1
 else
 	chmod +rw "$VERIFYGESTIONES"
@@ -193,7 +205,7 @@ fi
 if [ ! -f "$VERIFYNXE" ]
 then
 	echo "No existe el archivo $VERIFYNXE, es necesario ejecutar el instalador InsPro.sh previamente"
-	$GRUPO/Glog.sh "$0" "No existe el archivo $VERIFYNXE, es necesario ejecutar el instalador InsPro.sh previamente" 'ERR'
+	$GRUPO/Glog.sh "IniPro.sh" "No existe el archivo $VERIFYNXE, es necesario ejecutar el instalador InsPro.sh previamente" 'ERR'
 	exit 1
 else
 	chmod +rw "$VERIFYNXE"
@@ -202,7 +214,7 @@ fi
 if [ ! -f "$VERIFYAXG" ]
 then
 	echo "No existe el archivo $VERIFYAXG, es necesario ejecutar el instalador InsPro.sh previamente"
-	$GRUPO/Glog.sh "$0" "No existe el archivo $VERIFYAXG, es necesario ejecutar el instalador InsPro.sh previamente" 'ERR'
+	$GRUPO/Glog.sh "IniPro.sh" "No existe el archivo $VERIFYAXG, es necesario ejecutar el instalador InsPro.sh previamente" 'ERR'
 	exit 1
 else
 	chmod +rw "$VERIFYAXG"
@@ -210,7 +222,7 @@ fi
 ################################################################################################
 
 echo "Estado del Sistema: INICIALIZADO"
-$GRUPO/Glog.sh "$0" "Estado del Sistema: INICIALIZADO" 'INFO'
+$GRUPO/Glog.sh "IniPro.sh" "Estado del Sistema: INICIALIZADO" 'INFO'
 
 preguntarActivarRecPro()
 {
@@ -221,13 +233,13 @@ preguntarActivarRecPro()
 			#TODO: Ver si esta bien explicado como correr el Stop.sh
 			echo "El proceso RecPro.sh ya ha sido ejecutado y se encuentra corriendo."
 			echo "Para detener el proceso RecPro activo, ejecute el comando $GRUPO/Stop.sh"
-			$GRUPO/Glog.sh "$0" 'El proceso RecPro.sh ya ha sido ejecutado y se encuentra corriendo' 'ERR'
+			$GRUPO/Glog.sh "IniPro.sh" 'El proceso RecPro.sh ya ha sido ejecutado y se encuentra corriendo' 'ERR'
 			exit 1
 		else
 			$BINDIR/RecPro.sh
 			RECPROPROCESSID=$(/bin/ps -fu $USER | grep "RecPro.sh" | grep -v "grep" | awk '{print $2}')
 			echo "RecPro corriendo bajo el no.: $RECPROPROCESSID"
-			$GRUPO/Glog.sh "$0" "RecPro corriendo bajo el no.: $RECPROPROCESSID" 'INFO'
+			$GRUPO/Glog.sh "IniPro.sh" "RecPro corriendo bajo el no.: $RECPROPROCESSID" 'INFO'
 			exit 1
 		fi
 	elif [ "$activarRecPro" = "no" ]; then
