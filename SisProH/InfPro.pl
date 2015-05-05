@@ -1,4 +1,7 @@
 #!/bin/perl
+
+use 5.010;
+
 #Comando para la Obtención de Informes y estadísticas
 
 #• Es el cuarto en orden de ejecución
@@ -72,7 +75,7 @@ sub mostrarDataConsultas {
 	my ($opcionUno,$opcionDosDesde,$opcionDosHasta,$opcionTresDesde,$opcionTresHasta,$opcionCuatro,$opcionCinco) = @_;
 	my (@gestionDirectory, @gestionDirectoryAProcesar);
 	my ($currentDirToProcess);
-	my(@filesToProcess, @filteredData,@sortedData);
+	my(@filesToProcess, @filteredData,@sortedData,%filteredDataHash);
 	####Ahora que tengo todo debería mostrarle la data
 	@filesToProcess = &applyFilterGestion($opcionCuatro);											#Opción Cuatro
 	@filesToProcess = &applyFilterEmisor($opcionCinco, @filesToProcess);							#Opción Cinco
@@ -82,8 +85,11 @@ sub mostrarDataConsultas {
 
 	if ($#ARGV >= 1) {
 		#significa que quiere filtrar por algo más
-		@filteredData = &applyFilterKeyword(@filteredData);
-		@sortedData = &applySortByWeight(@filteredData);
+		%filteredDataHash = &applyFilterKeyword(@filteredData);
+		#Y esto que sigue no lo puedo meter en una funcion porque le tendría que pasar un hash y un array
+		foreach my $theKey (sort { $filteredDataHash{$b} <=> $filteredDataHash{$a} } keys %filteredDataHash) {
+   			printf "%-8s %s\n", $theKey, $filteredDataHash{$theKey};
+		}
 	}
 	else{
 		#ordenar cronológicamente
@@ -93,7 +99,32 @@ sub mostrarDataConsultas {
 }
 
 sub applyFilterKeyword {
-	
+	my (@filteredData) = @_;
+	my (%retvalhash,$causante,$extracto,@wordsCausante,@wordsExtracto);
+
+	foreach $lineOfData (@filteredData) {
+		my $totalPowerOfTheLineOfData = 0;
+		$causante = `echo "$lineOfData" | cut -d ';' -f 5`;
+		$extracto = `echo "$lineOfData" | cut -d ';' -f 6`;
+
+		@wordsCausante = split(" ",$causante);
+		@wordsExtracto = split(" ",$extracto);
+
+		foreach $word (@wordsCausante) {
+			#por cada vez que encuentre la palabra en el causante le sumo 10
+			if ($ARGV[1] eq $word) {
+				$totalPowerOfTheLineOfData += 10;
+			}
+		}
+		foreach $word (@wordsExtracto) {
+			#Lo mismo que el anterior pero ahora con el extracto, aca le sumo 1
+			if ($ARGV[1] eq $word) {
+				$totalPowerOfTheLineOfData += 1;
+			}
+		}
+		$retvalhash{$lineOfData} = $totalPowerOfTheLineOfData;
+	}
+	return (%retvalhash);
 }
 
 sub applyFilterNumeroNorma {
