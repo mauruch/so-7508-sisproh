@@ -1,8 +1,9 @@
 #Comando para la Protocolización
-./Glog.sh "$0" "Inicio de ProPro" "INFO"
+
+nombreScript=`basename "$0"`
+$GRUPO/Glog.sh "$nombreScript" "Inicio de ProPro" "INFO"
 
 cd $ACEPDIR
-
 contador=0
 if [ -d Peron1 ]; then
 	ARRAY[$contador]="Peron1"
@@ -109,6 +110,10 @@ if [ -d Fernandez2 ]; then
 	contador=$((contador+1))
 fi
 
+contadorAceptados=0
+contadorRechazados=0
+
+
 
 GrabarRegistroProtocolizado(){
 #$1 linea
@@ -153,14 +158,15 @@ echo "$3"";""$4"";""$2" >> $archivo
 }
 
 AgregarContadorALaTabla(){
-#grabar en el log que se actualizo la tabla
 #$1 es la regex
 #si es la primera vez que se actualiza, mueve al archivo
+$GRUPO/Glog.sh "$nombreScript" "Se agrego un contador a la tabla de contadores" "INFO"
 if [ -e $MAEDIR/tab/axg.tab ]; then
 	cd $MAEDIR/tab
 	if [ ! -d "ant" ]; then
   		mkdir "ant"
 	fi	
+	$GRUPO/Glog.sh "$nombreScript" “tabla de contadores preservada antes de su modificación en $MAEDIR/tab/ant” "INFO"
 	$GRUPO/Mover.sh $MAEDIR/tab/axg.tab $MAEDIR/tab/ant ProPro.sh
 fi
 cd $MAEDIR/tab
@@ -172,15 +178,16 @@ echo "$ultimoId"";""$1""2;""$USER"";""$fechaActual" >> axgAux
 
 
 ActualizarContadorDeLaTabla(){
-# hay q grabar un log aca
 #$1 es la norma
 #$2 es la regex
 #si es la primera vez que se actualiza, mueve al archivo
+$GRUPO/Glog.sh "$nombreScript" "Se actualizo un contador de la tabla de contadores" "INFO"
 if [ -e $MAEDIR/tab/axg.tab ]; then
 	cd $MAEDIR/tab
 	if [ ! -d "ant" ]; then
   		mkdir "ant"
 	fi	
+	$GRUPO/Glog.sh "$nombreScript" “tabla de contadores preservada antes de su modificación en $MAEDIR/tab/ant” "INFO"
 	$GRUPO/Mover.sh $MAEDIR/tab/axg.tab $MAEDIR/tab/ant ProPro.sh
 fi
 cd $MAEDIR/tab
@@ -378,10 +385,12 @@ aux=($(grep "$norma"";""$emisor" $MAEDIR/tab/nxe.tab))
 if [ "${#aux[@]}" != 0 ]; then
 	ValidarRegistros $1 $2
 	# grabar log 
+	contadorAceptados=$((contadorAceptados+1))
 	$GRUPO/Mover.sh $ACEPDIR/"$2"/"$1" $PROCDIR/proc ProPro.sh
 else
-	/home/santiago/Escritorio/sisop2/Glog.sh "$0" "Se rechaza el archivo. Emisor no habilitado en este tipo de norma." "ERR"
-	/home/santiago/Escritorio/sisop2/Mover.sh $ACEPDIR/"$2"/"$1" $RECHDIR ProPro.sh
+	$GRUPO/Glog.sh "$nombreScript" "Se rechaza el archivo. Emisor no habilitado en este tipo de norma." "ERR"
+	contadorRechazados=$((contadorRechazados+1))
+	$GRUPO/Mover.sh $ACEPDIR/"$2"/"$1" $RECHDIR ProPro.sh
 fi
 
 }
@@ -389,10 +398,11 @@ fi
 
 ProcesarArchivo(){
 cd $PROCDIR/proc
-/home/santiago/Escritorio/sisop2/Glog.sh "$0" "Archivo a procesar: $1" "INFO"
+$GRUPO/Glog.sh "$nombreScript" "Archivo a procesar: $1" "INFO"
 if [ -s $1 ]; then
-	/home/santiago/Escritorio/sisop2/Glog.sh "$0" "Se rechaza el archivo por estar DUPLICADO." "ERR"
-	/home/santiago/Escritorio/sisop2/Mover.sh $ACEPDIR/"$2"/"$1" $RECHDIR ProPro.sh
+	$GRUPO/Glog.sh "$nombreScript" "Se rechaza el archivo por estar DUPLICADO." "ERR"
+	contadorRechazados=$((contadorRechazados+1))
+	$GRUPO/Mover.sh $ACEPDIR/"$2"/"$1" $RECHDIR ProPro.sh
 else
 	ValidarNormaEmisor $1 $2
 fi
@@ -418,9 +428,10 @@ fi
 if [ -e axgAux2 ]; then
 	rm axgAux2
 fi
-
+#los tres logs de los contadores
 #log de fin de propro
 
-
-
-
+$GRUPO/Glog.sh "$nombreScript" "Cantidad de archivos a procesar" "INFO"
+$GRUPO/Glog.sh "$nombreScript" "Cantidad de archivos procesados $contadorAceptados" "INFO"
+$GRUPO/Glog.sh "$nombreScript" "Cantidad dearchivos rechazados $contadorRechazados" "INFO"
+$GRUPO/Glog.sh "$nombreScript" "Fin de ProPro" "INFO"
