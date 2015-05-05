@@ -17,6 +17,7 @@ $checkEmisores = "MAEDIR/emisores.mae";
 $checkNormas = "MAEDIR/normas.mae";
 $checkGestiones = "MAEDIR/gestiones.mae";
 $checkInfodir = "INFODIR";
+$INFODIR = "INFODIR";
 $checkProcdir = "PROCDIR";
 #Y lo meto en un array para usar un foreach, porque el foreach es lo mas grande que hay, como manaos
 @arrayDeCheckeos = ($checkEmisores,$checkNormas,$checkGestiones,$checkInfodir,$checkProcdir);
@@ -83,6 +84,29 @@ sub mostrarDataConsultas {
 	@filesToProcess = &applyFilterCodigoNorma($opcionUno, @filesToProcess);							#Opción Uno
 	@filteredData = &applyFilterNumeroNorma($opcionTresDesde,$opcionTresHasta,@filesToProcess);		#Opción Tres
 
+
+
+	if ($ARGV[0] eq '-cg') {
+	#Y aca debería escribir en un archivo
+		my $salir = 0;
+		my $contador = 1;
+		my $filePath;
+		while ( $salir == 0) {	
+			$filePath = "$INFODIR/resultados_$contador";
+			if ( -e $filePath ){
+				$contador +=1;
+			}
+			else {
+				$salir = 1;
+			}
+		}
+		unless(open FILE, '>'."$filePath") {
+			die "Unable to create $filePath";
+		}
+	}
+
+
+
 	if ($#ARGV >= 1) {
 		#significa que quiere filtrar por algo más
 		%filteredDataHash = &applyFilterKeyword(@filteredData);
@@ -96,22 +120,29 @@ sub mostrarDataConsultas {
    				print "$keyArrayed[5]\n";
    				if ($ARGV[0] eq '-cg') {
    					#Y aca debería escribir en un archivo
-   				}
+					print FILE "$keyArrayed[12] EMISOR $keyArrayed[13] $keyArrayed[2] $keyArrayed[3] $keyArrayed[11] $keyArrayed[1] $keyArrayed[4] $keyArrayed[5] $keyArrayed[10]\n";
+   				}#Fin del guardado
 			}
-		}
+		}		
 	}
 	else{
 		#ordenar cronológicamente
 		%filteredDataHash = &makeHashWithDates(@filteredData);
+		#http://stackoverflow.com/questions/2491471/how-can-i-sort-dates-in-perl
 		foreach my $theKey (sort { join('', (split '/', $a)[2,1,0]) cmp join('', (split '/', $b)[2,1,0]) } keys %filteredDataHash) {
-			   	#TODO tengo el codigo de emisor pero no el emisor, de ultima leo el archivo y me armo el hash
-   				print "$keyArrayed[12] EMISOR($keyArrayed[13]) $keyArrayed[2]/$keyArrayed[3] $keyArrayed[11] $keyArrayed[1]\n";
-   				print "$keyArrayed[4]\n";
-   				print "$keyArrayed[5]\n";
-   				if ($ARGV[0] eq '-cg') {
-   					#Y aca debería escribir en un archivo
-   				}
+	   		#TODO tengo el codigo de emisor pero no el emisor, de ultima leo el archivo y me armo el hash
+			print "$keyArrayed[12] EMISOR($keyArrayed[13]) $keyArrayed[2]/$keyArrayed[3] $keyArrayed[11] $keyArrayed[1]\n";
+			print "$keyArrayed[4]\n";
+			print "$keyArrayed[5]\n";
+			if ($ARGV[0] eq '-cg') {
+				#Y aca debería escribir en un archivo
+				print FILE "$keyArrayed[12] EMISOR $keyArrayed[13] $keyArrayed[2] $keyArrayed[3] $keyArrayed[11] $keyArrayed[1] $keyArrayed[4] $keyArrayed[5] $keyArrayed[10]\n";
+			}
 		}
+	}
+
+	if ($ARGV[0] eq '-cg') {
+		close FILE;
 	}
 
 	&menuPreguntaSiSeguirConsultando;
