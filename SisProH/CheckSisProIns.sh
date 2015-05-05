@@ -3,9 +3,9 @@
 insproConf=$CONFDIR/InsPro.conf
 head_msg="TP SO7508 Primer Cuatrimestre 2015. Tema H Copyright © Grupo 06"
 
-#if [ -f $insproLog ] || [ $# -eq 1 ]; then
-    echo $head_msg
-	echo -e "\n"
+echo $head_msg
+bash $GRUPO/Glog.sh "InsPro.sh" "$head_msg"
+echo -e "\n"
 
 array_key=( "$CONFDIR" "$BINDIR" "$MAEDIR" "$NOVEDIR" "$DATASIZE" "$ACEPDIR" "$RECHDIR" "$PROCDIR" "$INFODIR" "$DUPDIR" "$LOGDIR" "$LOGSIZE" )
 
@@ -18,22 +18,12 @@ for (( i=0;i<$elements;i++ )); do
 	KEY=${array_key[${i}]}
 
 	echo -e "${array_value[${i}]}: $KEY \n"
+	bash $GRUPO/Glog.sh "InsPro.sh" "${array_value[${i}]}: $KEY"
 
-	#listar los archivos cuando es necesario
-	#if [ "$KEY" = "$CONFDIR" ] || [ "$KEY" = "$BINDIR" ] || [ "$KEY" = "$MAEDIR" ]	|| [ "$KEY" = "$LOGDIR" ] ; then
-	#	ls $KEY
-	#fi
-	
 done
 
-echo -e "\n"
-
-#fi
-
-
-#if perl < /dev/null > /dev/null 2>&1  ; then
-#     perl -v
-#else
-#      echo dang... no perl
-#fi
+if [ $# -eq 0 ]; then
+	echo -e "Proceso de Instalción Cancelado \n"
+	bash $GRUPO/Glog.sh "InsPro.sh" "Proceso de Instalción Cancelado"
+fi
 

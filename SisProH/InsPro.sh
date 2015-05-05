@@ -1,6 +1,5 @@
 #Comando de instalacion
 
-export insproLog="InsPro.log"
 export GRUPO=$HOME/GRUPO06
 export CONFDIR="$GRUPO/conf"
 
@@ -42,6 +41,7 @@ for (( i=0;i<11;i++)); do
 	fi
 	
 	#ej Defina el directorio para los ejecutables (default):
+	$GRUPO/Glog.sh "InsPro.sh" "Defina $v ($d):" "INFO"
     echo "Defina $v ($d):"
 	read input
 
@@ -76,86 +76,52 @@ for (( i=0;i<11;i++)); do
 done 
 }
 
-#->FUNCION: Inicializar el archivo de log----------------------------------------------------------------------#
-#    Se utiliza el archivo InsPro.log
-#  1->Si el archivo no existe lo creo
-#EXPORT: CONFDIR , AMBIENTE_INICIALIZADO
 
-function crear_directorio()
-{
-	if ! [ -d $1 ]; then
-		mkdir $1
-		echo "Directorio $1 creado correctamente."
-		echo "`date` $user : Directorio $1 creado correctamente." >> $insproLog
-	fi
-return 0
-}
-
-function f_inicializar_log ()
-{
-	inicio_instalacion="Inicio de Instalacion"
-
-	echo "Archivo de Log inicializado"
-	echo ""
-	if [ -f $insproLog ]
-	then
-		# si existe creo otro con la fecha actual
-      	  	fecha_hora_actual=`date +%S`
-   		rename_insproLog=`echo $insproLog.$fecha_hora_actual`
-      	 	error=`mv $insproLog $rename_insproLog`
-		insproLog=`echo $rename_insproLog`
-	fi
-
-	# Grabo primer linea de archivo de Log
-	inicio_instalacion=`date``users` ":" $inicio_instalacion 
-	error=`echo -e $inicio_instalacion > $insproLog`
-	
-	return 0
-}
 
 #######################################
 #PRINCIPAL
 
-
-
 msgHeader="TP SO7508 Primer Cuatrimestre 2015. Tema H Copyright © Grupo 06"
 
-##Inicializo Log
-f_inicializar_log
+bash $GRUPO/Glog.sh "InsPro.sh" "Inicio de Ejecución de InsPro"
+bash $GRUPO/Glog.sh "InsPro.sh" "Directorio predefinido de Configuración: $CONFDIR"
+bash $GRUPO/Glog.sh "InsPro.sh" "Log de la instalación: $CONFDIR/InsPro.sh.log" 
 
 
-#checkeo si esta instalado
-#checkInstallation
+bash $GRUPO/Glog.sh "InsPro.sh" "Verificando si SisProH está instalado"
 
+##Se checkea si esta instalado
+insproConf="$CONFDIR/InsPro.conf"
 
-#######Luis: No se puede hacer touch porque creamos los directorios luego, es decir, el directorio de LOG y Conf no existe
-#######Luis: Agrego modificacion para que los directorios se creen ni bien el usuario los ingresa 
+bash $GRUPO/Glog.sh "InsPro.sh" "Verificando si existe el archivo $insproConf"
 
-##se crea el log de la instalacion
-#insproConf="$CONFDIR/InsPro.conf"
-#insproLog="$CONFDIR/InsPro.log"
-#if [ ! -f $insproLog ]; then
-#    touch $insproLog
-#else 
-#	echo "checkeando instalación"
-##	bash checkSisProIns.sh
-#fi
+if [ ! -f $insproConf ]; then
+	bash $GRUPO/Glog.sh "InsPro.sh" "El archivo no existe, se continúa con la instalción"
+else 
+	bash $GRUPO/Glog.sh "InsPro.sh" "El archivo existe, checkeando la instalación..."
+	bash CheckSisProIns.sh
+	exit 1
+fi
 
 ################################
 
 ####### 5. Chequear que Perl esté instalado #########
 
+bash $GRUPO/Glog.sh "InsPro.sh" "Verificando que Perl esté instalado"
 if perl < /dev/null > /dev/null 2>&1  ; then
 	#checkear version
 	perlResult=`perl -v | grep 'perl 5'`
 	if [ "$perlResult" != "" ]; then
-		echo -e "$msgHeader \n"	
+		echo -e "$msgHeader \n"
+		bash $GRUPO/Glog.sh "InsPro.sh" "Perl Version: `perl -v`"
 		echo "Perl Version: `perl -v`"
 		echo -e "\n"
 	else
+		bash $GRUPO/Glog.sh "InsPro" "Para instalar el TP es necesario contar con Perl 5 o superior. Efectúe su instalación e inténtelo 		nuevamente. \n Proceso de Instalación Cancelado" "ERROR"
 		echo -e "Para instalar el TP es necesario contar con Perl 5 o superior. Efectúe su instalación e inténtelo nuevamente. \n Proceso de 			Instalación Cancelado"
 	fi
 else
+	bash $GRUPO/Glog.sh "InsPro" "Para instalar el TP es necesario contar con Perl 5 o superior. Efectúe su instalación e inténtelo 			nuevamente. \n Proceso de Instalación Cancelado" "ERROR"
     echo -e "Para instalar el TP es necesario contar con Perl 5 o superior. Efectúe su instalación e inténtelo nuevamente. \n Proceso de 		Instalación Cancelado"
 fi
 
@@ -183,12 +149,6 @@ do
 	
 	#limpiar pantalla
 	clear
-
-	 $GRUPO/Glog.sh "InsPro.sh" "Inicio de la Ejecución de InsPro" "INFO"
-	 $GRUPO/Glog.sh "InsPro.sh" "Directorio predefinido de Configuracion: $CONFDIR" "INFO"
-	 $GRUPO/Glog.sh "InsPro.sh" "Log de la instalación: $insproLog" "INFO"
-
-
 
 	#llamo a la funcion para que imprima las variables
 	bash CheckSisProIns.sh "showVariables"
@@ -230,7 +190,7 @@ if [ "$confirmInstall" = "s" ]; then
 		k="${array_key[$i]}"
 		eval finalDir=\${"$k"}
 		
-		if [ "$k" != "DATASIZE" ] || [ "$k" != "LOGSIZE" ]; then	
+		if [ "$k" != "DATASIZE" ] && [ "$k" != "LOGSIZE" ]; then
 			#si no existe el dir se crea
 			if [ ! -d $finalDir ]; then
     				mkdir $finalDir
@@ -250,21 +210,10 @@ if [ "$confirmInstall" = "s" ]; then
 		fi
 	done
 fi
-################LUIS####################
-insproConf="$CONFDIR/InsPro.conf"
-
-	crear_directorio $CONFDIR
-if [ ! -f $insproConf ]; then
-    touch $insproConf
-	#else 
-	#echo "checkeando instalación"
-	#bash CheckSisProIns.sh
-	#exit 1
-fi
-#####################################				
 
 echo -e "\n"
 echo -e "Instalando Archivos Maestros y Tablas \n"
+bash $GRUPO/Glog.sh "InsPro.sh" "Instalando Archivos Maestros y Tablas"
 
 #Nombre de la carpeta que contiene los datos
 dataDir="2015-1C-Datos/"
@@ -287,6 +236,7 @@ done
 
 ###### 20.3 Mover los ejecutables y funciones  #######
 echo -e "Instalando Programas y Funciones \n"
+bash $GRUPO/Glog.sh "InsPro.sh" "Instalando Programas y Funciones"
 lsScriptsResult=`ls | grep '\.\(sh\|pl\)$'`
 currentDirectory=`pwd`
 for f in $lsScriptsResult; do
@@ -297,7 +247,10 @@ done
 
 ###### 20.4 Actualizar el archivo de configuración  #######
 echo -e "Actualizando la configuración del sistema \n"
-
+bash $GRUPO/Glog.sh "InsPro.sh" "Actualizando la configuración del sistema"
+if [ ! -f $insproConf ]; then
+	touch $insproConf
+fi
 for (( i=0;i<11;i++)); do
 	k="${array_key[$i]}"
 	eval finalDir=\${"$k"}
@@ -311,5 +264,3 @@ done
 echo "Instalación CONCLUIDA"
 
 #instalacion exitosa
-touch $CONFDIR/InsPro.conf
-
