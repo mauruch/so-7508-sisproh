@@ -1,26 +1,39 @@
 #!/bin/bash
 #Comando para la configuración inicial del entorno de ejecución del Sistema
-
 export GRUPO=$HOME/GRUPO06
 export CONFDIR=$GRUPO/conf
 INSPROCONF="$CONFDIR/InsPro.conf"
 chmod +x $GRUPO/Glog.sh
 chmod +rw $INSPROCONF
 
-#Verifico que no este corriendo un proceso IniPro.sh
-if pgrep "IniPro.sh"
-then
-	echo "El proceso IniPro.sh ya ha sido ejecutado y se encuentra corriendo"
-	$GRUPO/Glog.sh "$0" 'El proceso IniPro.sh ya ha sido ejecutado y se encuentra corriendo' 'ERR'
+################################################################################################
+################ VERIFICO SI LAS VARIABLES DE AMBIENTE YA ESTAN SETEADAS  ######################
+################################################################################################
+
+continuo_proceso_iniPro="false"
+array_key=( "$CONFDIR" "$BINDIR" "$MAEDIR" "$NOVEDIR" "$DATASIZE" "$ACEPDIR" "$RECHDIR" "$PROCDIR" "$INFODIR" "$DUPDIR" "$LOGDIR" "$LOGSIZE" )
+elements=${#array_key[@]}
+for (( i=0;i<$elements;i++ )); do
+
+	KEY=${array_key[${i}]}
+
+	if [ "" = "$KEY" ]; then
+		#Si al menos una variable de ambiente se encuentra vacia
+		#debere setear el ambiente
+		continuo_proceso_iniPro="true"
+	fi
+	
+done
+if [ $continuo_proceso_iniPro = "false" ]; then
+	echo "Ambiente ya inicializado, si quiere reiniciar termine su sesión e ingrese nuevamente"
+	$GRUPO/Glog.sh "$0" 'Ambiente ya inicializado, si quiere reiniciar termine su sesión e ingrese nuevamente' 'ERR'
 	exit 1
 fi
+################################################################################################
 
 
 
-#Verifico que las variables de ambiente no esten ya seteadas
-#Seteo variables de entorno tomadas del archivo InsPro.conf
 
-#BINDIR=/faf/
 ################################################################################################
 ################################## SETEO VARIABLES DE ENTORNO  #################################
 ################################################################################################
@@ -71,9 +84,9 @@ echo "Expotando variable LOGDIR -> $LOGDIR"
 export $LOGDIR
 
 
-array_key=( "$CONFDIR" "$BINDIR" "$MAEDIR" "$NOVEDIR" "$DATASIZE" "$ACEPDIR" "$RECHDIR" "$PROCDIR" "$INFODIR" "$DUPDIR" "$LOGDIR" "$LOGSIZE" )
+array_key=( "$CONFDIR" "$BINDIR" "$MAEDIR" "$NOVEDIR" "$ACEPDIR" "$RECHDIR" "$PROCDIR" "$INFODIR" "$DUPDIR" "$LOGDIR" )
 
-array_value=( "Directorio de Configuración" "Directorio de Ejecutables" "Directorio de Maestros y Tablas" "Directorio de recepción de documentos para protocolización" "Espacio mínimo libre para arribos [Mb]" "Directorio de Archivos Aceptados" "Directorio de Archivos Rechazados" "Directorio de Archivos Protocolizados" "Directorio para informes y estadísticas" "Nombre para el repositorio de duplicados" "Directorio para Archivos de Log" "Tamaño máximo para los archivos de log del sistema [Kb]")
+array_value=( "Directorio de Configuración" "Directorio de Ejecutables" "Directorio de Maestros y Tablas" "Directorio de recepción de documentos para protocolización" "Directorio de Archivos Aceptados" "Directorio de Archivos Rechazados" "Directorio de Archivos Protocolizados" "Directorio para informes y estadísticas" "Nombre para el repositorio de duplicados" "Directorio para Archivos de Log" )
 
 elements=${#array_key[@]}
 
@@ -81,7 +94,7 @@ for (( i=0;i<$elements;i++ )); do
 
 	KEY=${array_key[${i}]}
 
-	echo -e "${array_value[${i}]}: $KEY \n"
+	echo -e "${array_value[${i}]}: $KEY"
 
 	#listar los archivos cuando es necesario 
 	if [ "$KEY" = "$CONFDIR" ] || [ "$KEY" = "$BINDIR" ] || [ "$KEY" = "$MAEDIR" ]	|| [ "$KEY" = "$LOGDIR" ] ; then
@@ -90,11 +103,8 @@ for (( i=0;i<$elements;i++ )); do
 	
 done
 
-echo -e "\n"
+################################################################################################
 
-################################################################################################
-############################## FIN DE SETEO VARIABLES DE ENTORNO  ##############################
-################################################################################################
 
 
 
@@ -198,10 +208,6 @@ else
 	chmod +rw "$VERIFYAXG"
 fi
 ################################################################################################
-##################################### FIN DE VERIFICACIONES  ###################################
-################################################################################################
-
-
 
 echo "Estado del Sistema: INICIALIZADO"
 $GRUPO/Glog.sh "$0" "Estado del Sistema: INICIALIZADO" 'INFO'
@@ -214,17 +220,20 @@ preguntarActivarRecPro()
 		then
 			#TODO: Ver si esta bien explicado como correr el Stop.sh
 			echo "El proceso RecPro.sh ya ha sido ejecutado y se encuentra corriendo."
-			echo "Para detener el proceso RecPro activo, ejecute el comando ./Stop.sh"
+			echo "Para detener el proceso RecPro activo, ejecute el comando $GRUPO/Stop.sh"
 			$GRUPO/Glog.sh "$0" 'El proceso RecPro.sh ya ha sido ejecutado y se encuentra corriendo' 'ERR'
 			exit 1
 		else
 			$BINDIR/RecPro.sh
+			RECPROPROCESSID=$(/bin/ps -fu $USER | grep "RecPro.sh" | grep -v "grep" | awk '{print $2}')
+			echo "RecPro corriendo bajo el no.: $RECPROPROCESSID"
+			$GRUPO/Glog.sh "$0" "RecPro corriendo bajo el no.: $RECPROPROCESSID" 'INFO'
 			exit 1
 		fi
 	elif [ "$activarRecPro" = "no" ]; then
 		#TODO: Ver si esta bien explicado como correr el Start.sh
 		echo "Usted no ha querido ejecutar el proceso RecPro.sh."
-		echo "Podra ejecutarlo luego corriendo el proceso ./Start.sh"
+		echo "Podra ejecutarlo luego corriendo el proceso $GRUPO/Start.sh"
 		exit 1
 	else
 		echo "$activarRecPro no es un comando valido."
@@ -232,6 +241,5 @@ preguntarActivarRecPro()
 	fi
 }
 preguntarActivarRecPro
-RECPROPROCESSID=$(/bin/ps -fu $USER | grep "RecPro.sh" | grep -v "grep" | awk '{print $2}')
-echo "RecPro corriendo bajo el no.: $RECPROPROCESSID"
-$GRUPO/Glog.sh "$0" "RecPro corriendo bajo el no.: $RECPROPROCESSID" 'INFO'
+
+
