@@ -184,9 +184,9 @@ do
 	#limpiar pantalla
 	clear
 
-	 ./Glog.sh "InsPro.sh" "Inicio de la Ejecución de InsPro" "INFO"
-	 ./Glog.sh "InsPro.sh" "Directorio predefinido de Configuracion: $CONFDIR" "INFO"
-	 ./Glog.sh "InsPro.sh" "Log de la instalación: $insproLog" "INFO"
+	 $GRUPO/Glog.sh "InsPro.sh" "Inicio de la Ejecución de InsPro" "INFO"
+	 $GRUPO/Glog.sh "InsPro.sh" "Directorio predefinido de Configuracion: $CONFDIR" "INFO"
+	 $GRUPO/Glog.sh "InsPro.sh" "Log de la instalación: $insproLog" "INFO"
 
 
 
