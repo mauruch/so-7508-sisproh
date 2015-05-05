@@ -27,44 +27,48 @@ fi
 
 #MOSTRAR, LOGUEAR Y EXPORTAR VARIABLE BINDIR Y SUS ARCHIVOS
 BINDIR=$(grep "BINDIR" "$INSPROCONF")
+echo "Expotando variable BINDIR -> $BINDIR"
 export $BINDIR
 
 #MOSTRAR, LOGUEAR Y EXPORTAR VARIABLE MAEDIR Y SUS ARCHIVOS
 MAEDIR=$(grep "MAEDIR" "$INSPROCONF")
+echo "Expotando variable MAEDIR -> $MAEDIR"
 export $MAEDIR
 
 #MOSTRAR, LOGUEAR Y EXPORTAR VARIABLE NOVEDIR
 NOVEDIR=$(grep "NOVEDIR" "$INSPROCONF")
+echo "Expotando variable NOVEDIR -> $NOVEDIR"
 export $NOVEDIR
 
 #MOSTRAR, LOGUEAR Y EXPORTAR VARIABLE ACEPDIR
 ACEPDIR=$(grep "ACEPDIR" "$INSPROCONF")
+echo "Expotando variable ACEPDIR -> $ACEPDIR"
 export $ACEPDIR
 
 #MOSTRAR, LOGUEAR Y EXPORTAR VARIABLE RECHDIR
 RECHDIR=$(grep "RECHDIR" "$INSPROCONF")
+echo "Expotando variable RECHDIR -> $RECHDIR"
 export $RECHDIR
 
 #MOSTRAR, LOGUEAR Y EXPORTAR VARIABLE PROCDIR
 PROCDIR=$(grep "PROCDIR" "$INSPROCONF")
+echo "Expotando variable PROCDIR -> $PROCDIR"
 export $PROCDIR
 
 #MOSTRAR, LOGUEAR Y EXPORTAR VARIABLE INFODIR
 INFODIR=$(grep "INFODIR" "$INSPROCONF")
+echo "Expotando variable INFODIR -> $INFODIR"
 export $INFODIR
 
 #MOSTRAR, LOGUEAR Y EXPORTAR VARIABLE DUPDIR
 DUPDIR=$(grep "DUPDIR" "$INSPROCONF")
+echo "Expotando variable DUPDIR -> $DUPDIR"
 export $DUPDIR
 
 #MOSTRAR, LOGUEAR Y EXPORTAR VARIABLE LOGDIR Y SUS ARCHIVOS
 LOGDIR=$(grep "LOGDIR" "$INSPROCONF")
+echo "Expotando variable LOGDIR -> $LOGDIR"
 export $LOGDIR
-
-
-
-#Seteo variable PATH
-export PATH="$2" #TODO:review
 
 
 array_key=( "$CONFDIR" "$BINDIR" "$MAEDIR" "$NOVEDIR" "$DATASIZE" "$ACEPDIR" "$RECHDIR" "$PROCDIR" "$INFODIR" "$DUPDIR" "$LOGDIR" "$LOGSIZE" )
@@ -81,7 +85,6 @@ for (( i=0;i<$elements;i++ )); do
 
 	#listar los archivos cuando es necesario 
 	if [ "$KEY" = "$CONFDIR" ] || [ "$KEY" = "$BINDIR" ] || [ "$KEY" = "$MAEDIR" ]	|| [ "$KEY" = "$LOGDIR" ] ; then
-		echo "TRATANDO DE LISTAR: $KEY"
 		ls "$KEY"
 	fi
 	

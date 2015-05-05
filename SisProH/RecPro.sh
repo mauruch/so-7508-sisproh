@@ -7,8 +7,8 @@
 ## NOTA: HAY QUE AJUSTAR LAS CARPETAS
 
 
-carpetaNovedades= $NOVEDIR
-carpetaAceptados= $ACEPDIR
+carpetaNovedades=$NOVEDIR
+carpetaAceptados=$ACEPDIR
 carpetaRechazados=$RECHDIR
 
 
@@ -28,8 +28,8 @@ ciclo=0
 function aceptarArch {
 	codGestion=${1%%_*} 
 	mkdir -p "$carpetaAceptados/$codGestion"
-	./Mover.sh "$carpetaNovedades/$1" "$carpetaAceptados/$codGestion"
-	./Glog.sh $nombreScript "El archivo $1 ha sido aceptado y movido a la carpeta $carpetaAceptados/$codGestion"
+	$GRUPO/Mover.sh "$carpetaNovedades/$1" "$carpetaAceptados/$codGestion"
+	$GRUPO/Glog.sh $nombreScript "El archivo $1 ha sido aceptado y movido a la carpeta $carpetaAceptados/$codGestion"
 
 }
 
@@ -37,7 +37,7 @@ function aceptarArch {
 # Función que sirve para rechazar un archivo
 # $1 es la ruta del archivo
 function rechazarArch {
-	./Mover.sh "$carpetaNovedades/$1" "$carpetaRechazados"
+	$GRUPO/Mover.sh "$carpetaNovedades/$1" "$carpetaRechazados"
 	
 
 }
@@ -182,7 +182,7 @@ function valFormatoNombreArch(){
 		then
 			let cont=$cont-2
 			mensaje="Nombre inválido, "${mensajeError[$cont]}
-			./Glog.sh $nombreScript "El archivo $1 ha sido rechazado por: $mensaje"
+			$GRUPO/Glog.sh $nombreScript "El archivo $1 ha sido rechazado por: $mensaje"
 			return 0
 		else
 			return 1
@@ -190,7 +190,7 @@ function valFormatoNombreArch(){
 		
 	else
 		mensaje="Cantidad de campos inválido"
-		./Glog.sh $nombreScript "El archivo $1 ha sido rechazado por: $mensaje"
+		$GRUPO/Glog.sh $nombreScript "El archivo $1 ha sido rechazado por: $mensaje"
 		return 0
 	fi
 
@@ -210,7 +210,7 @@ function detectarArribos(){
 	fi
 
 	#PASO 1: Imprimo el log
-	./Glog.sh "$nombreScript" "ciclo nro... $1"
+	$GRUPO/Glog.sh "$nombreScript" "ciclo nro... $1"
 
 	#PASO 2: Chequeo si hay archivos en NOVEDIR
 	cantidadArchivos=`ls -1 "$carpetaNovedades" | wc -l`
@@ -241,13 +241,13 @@ function detectarArribos(){
 					fi
 				else
 					#RECHAZADO
-					./Glog.sh  $nombreScript "El archivo $arch ha sido rechazado por: Archivo vacío"
+					$GRUPO/Glog.sh  $nombreScript "El archivo $arch ha sido rechazado por: Archivo vacío"
 					rechazarArch $arch 
 				fi
 
 			else
 				#RECHAZADO
-				./Glog.sh  $nombreScript "El archivo $arch ha sido rechazado por: Tipo Inválido"
+				$GRUPO/Glog.sh  $nombreScript "El archivo $arch ha sido rechazado por: Tipo Inválido"
 				rechazarArch $arch 
 
 			fi
@@ -260,10 +260,10 @@ function detectarArribos(){
 		if [ $res -gt 0 ]
 		then
 			pid=`pgrep feprima.sh`
-			./Glog.sh  $nombreScript "ProPro ya corriendo bajo el no.: $pid"
+			$GRUPO/Glog.sh  $nombreScript "ProPro ya corriendo bajo el no.: $pid"
 		else
-			./ProPro.sh 
-			./Glog.sh  $nombreScript "ProPro corriendo bajo el no.: $!"
+			$BINDIR/ProPro.sh 
+			$GRUPO/Glog.sh  $nombreScript "ProPro corriendo bajo el no.: $!"
 		fi
 
 		

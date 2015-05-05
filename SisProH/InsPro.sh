@@ -287,7 +287,7 @@ done
 
 ###### 20.3 Mover los ejecutables y funciones  #######
 echo -e "Instalando Programas y Funciones \n"
-lsScriptsResult=`ls | grep '\.sh$'`
+lsScriptsResult=`ls | grep '\.\(sh\|pl\)$'`
 currentDirectory=`pwd`
 for f in $lsScriptsResult; do
   if [ $f != "Glog.sh" ] && [ $f != "Mover.sh" ]; then  
