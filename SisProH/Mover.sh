@@ -13,7 +13,7 @@ then
 	echo "Para utilizar Mover.sh correctamente:"
 	echo "Mover ArchivoAMover Destino QuienHaceLaLlamada(opcional)"
 	#registrando en el log
-	./Glog.sh "$defaultCaller" 'Comando fue mal utilizado' 'ERR'
+	$GRUPO/Glog.sh "$defaultCaller" 'Comando fue mal utilizado' 'ERR'
 	exit 1
 fi
 
@@ -28,9 +28,9 @@ then
 	#registro esto en el log
 	if [ $# -eq 3 ]
 	then
-		./Glog.sh "$3" "Comando Mover.sh fue utilizado con origen igual a destino. Llamado por $3" 'INF'
+		$GRUPO/Glog.sh "$3" "Comando Mover.sh fue utilizado con origen igual a destino. Llamado por $3" 'INF'
 	else
-		./Glog.sh "$defaultCaller" "Comando Mover.sh fue utilizado con origen igual a destino. Llamado por $3" 'INF'
+		$GRUPO/Glog.sh "$defaultCaller" "Comando Mover.sh fue utilizado con origen igual a destino. Llamado por $3" 'INF'
 	fi
 	exit 0
 fi
@@ -42,9 +42,9 @@ then
 	#registro esto en el log
 	if [ $# -eq 3 ]
 	then
-		./Glog.sh "$3" "Directorio $ORIGENDIR inexistente, archivo $ORIGENFILE no movido." 'ERR'
+		$GRUPO/Glog.sh "$3" "Directorio $ORIGENDIR inexistente, archivo $ORIGENFILE no movido." 'ERR'
 	else
-		./Glog.sh "$defaultCaller" "Directorio $ORIGENDIR inexistente, archivo $ORIGENFILE no movido." 'ERR'
+		$GRUPO/Glog.sh "$defaultCaller" "Directorio $ORIGENDIR inexistente, archivo $ORIGENFILE no movido." 'ERR'
 	fi
 	exit 1
 fi
@@ -56,9 +56,9 @@ then
 	#registro esto en el log
 	if [ $# -eq 3 ]
 	then
-		./Glog.sh "$3" "Directorio $2 inexistente, archivo $ORIGENFILE no movido." 'ERR'
+		$GRUPO/Glog.sh "$3" "Directorio $2 inexistente, archivo $ORIGENFILE no movido." 'ERR'
 	else
-		./Glog.sh "$defaultCaller" "Directorio $2 inexistente, archivo $ORIGENFILE no movido." 'ERR'
+		$GRUPO/Glog.sh "$defaultCaller" "Directorio $2 inexistente, archivo $ORIGENFILE no movido." 'ERR'
 	fi
 	exit 1
 fi
@@ -70,9 +70,9 @@ then
 	#registro esto en el log
 	if [ $# -eq 3 ]
 	then
-		./Glog.sh "$3" "No existe $1." 'ERR'
+		$GRUPO/Glog.sh "$3" "No existe $1." 'ERR'
 	else
-		./Glog.sh "$defaultCaller" "No existe $1." 'ERR'
+		$GRUPO/Glog.sh "$defaultCaller" "No existe $1." 'ERR'
 	fi
 	exit 1
 fi
@@ -87,9 +87,9 @@ then
 	mv "$1" "$FILEDESTINY"
 	if [ $# -eq 3 ]
 	then
-		./Glog.sh "$3" "$1 movido a $2" 'INF'
+		$GRUPO/Glog.sh "$3" "$1 movido a $2" 'INF'
 	else
-		./Glog.sh "$defaultCaller" "$1 movido a $2" 'INF'
+		$GRUPO/Glog.sh "$defaultCaller" "$1 movido a $2" 'INF'
 	fi
 	exit 0
 else
@@ -132,9 +132,9 @@ else
 				echo "Archivo movido a la carpeta $DUPLICATEDDIRECTORY bajo el nombre: $ORIGENFILE.$COUNTERFIRST$COUNTERMIDDLE$COUNTERLAST"
 				if [ $# -eq 3 ]
 				then
-					./Glog.sh "$3" "$1 movido a $DUPLICATEDDIRECTORY$ORIGENFILE.$COUNTERFIRST$COUNTERMIDDLE$COUNTERLAST" 'WAR'
+					$GRUPO/Glog.sh "$3" "$1 movido a $DUPLICATEDDIRECTORY$ORIGENFILE.$COUNTERFIRST$COUNTERMIDDLE$COUNTERLAST" 'WAR'
 				else
-					./Glog.sh "$defaultCaller" "$1 movido a $2" 'WAR'
+					$GRUPO/Glog.sh "$defaultCaller" "$1 movido a $2" 'WAR'
 				fi
 				FLAGENTER=1
 				exit 0

@@ -1,7 +1,7 @@
 #Comando de instalacion
 
 export insproLog="InsPro.log"
-export GRUPO=$HOME/Instalacion
+export GRUPO=$HOME/GRUPO06
 export CONFDIR="$GRUPO/conf"
 
 #Lo primero que vamos a hacer sería decirle a todos los scripts que son ejecutables
@@ -256,9 +256,10 @@ insproConf="$CONFDIR/InsPro.conf"
 	crear_directorio $CONFDIR
 if [ ! -f $insproConf ]; then
     touch $insproConf
-else 
-	echo "checkeando instalación"
-	bash CheckSisProIns.sh
+	#else 
+	#echo "checkeando instalación"
+	#bash CheckSisProIns.sh
+	#exit 1
 fi
 #####################################				
 
@@ -289,7 +290,9 @@ echo -e "Instalando Programas y Funciones \n"
 lsScriptsResult=`ls | grep '\.sh$'`
 currentDirectory=`pwd`
 for f in $lsScriptsResult; do
-  bash Mover.sh "$currentDirectory/$f" "$BINDIR" "InsPro.sh"
+  if [ $f != "Glog.sh" ] && [ $f != "Mover.sh" ]; then  
+    bash Mover.sh "$currentDirectory/$f" "$BINDIR" "InsPro.sh"
+  fi
 done
 
 ###### 20.4 Actualizar el archivo de configuración  #######

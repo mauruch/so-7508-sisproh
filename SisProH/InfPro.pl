@@ -1,4 +1,4 @@
-#!/bin/perl
+#!/usr/bin/perl
 #Comando para la Obtención de Informes y estadísticas
 
 #• Es el cuarto en orden de ejecución
