@@ -82,7 +82,7 @@ case "$1" in
 	ProPro.sh)
 		archivoLog=$LOGDIR"/"$1".log" ;;
 	InsPro.sh)
-		archivoLog=$LOGDIR"/"$1".log" ;;
+		archivoLog=$GRUPO"/conf/"$1".log" ;;
 	Stop.sh)
 		archivoLog=$LOGDIR"/"$1".log" ;;
 	RecPro.sh)
@@ -103,7 +103,6 @@ esac
 	#Si existe el archivo
 	if [ -f $archivoLog ]
 	then
-		echo  "el di $logPathDefault hola"
 		#Nos guardamos el tamaño del log
 		tamanioArchivo=`stat -c %s $archivoLog`
 
@@ -127,7 +126,6 @@ esac
 			fi
 		fi
     	else
-	echo  "el di $logPathDefault hola"
 		touch $archivoLog
     	fi   
 

@@ -1,4 +1,7 @@
 #!/bin/perl
+
+use 5.010;
+
 #Comando para la Obtención de Informes y estadísticas
 
 #• Es el cuarto en orden de ejecución
@@ -17,7 +20,7 @@ $checkInfodir = "INFODIR";
 $checkProcdir = "PROCDIR";
 #Y lo meto en un array para usar un foreach, porque el foreach es lo mas grande que hay, como manaos
 @arrayDeCheckeos = ($checkEmisores,$checkNormas,$checkGestiones,$checkInfodir,$checkProcdir);
-my $count_args = $#ARGV + 1;
+my $count_args = $#ARGV + 1;	#sirve o se borra?
 
 &checkeos;
 &decideWhatToDo;
@@ -72,34 +75,87 @@ sub mostrarDataConsultas {
 	my ($opcionUno,$opcionDosDesde,$opcionDosHasta,$opcionTresDesde,$opcionTresHasta,$opcionCuatro,$opcionCinco) = @_;
 	my (@gestionDirectory, @gestionDirectoryAProcesar);
 	my ($currentDirToProcess);
-	my(@filesToProcess, @filteredData);
+	my(@filesToProcess, @filteredData,@sortedData,%filteredDataHash);
 	####Ahora que tengo todo debería mostrarle la data
 	@filesToProcess = &applyFilterGestion($opcionCuatro);											#Opción Cuatro
 	@filesToProcess = &applyFilterEmisor($opcionCinco, @filesToProcess);							#Opción Cinco
 	@filesToProcess = &applyFilterYear($opcionDosDesde,$opcionDosHasta,@filesToProcess);			#Opción Dos
 	@filesToProcess = &applyFilterCodigoNorma($opcionUno, @filesToProcess);							#Opción Uno
-	@filteredData = &applyFilterNumeroNorma($opcionTresDesde,$opcionTresHasta,@filesToProcess);	#Opción Tres
+	@filteredData = &applyFilterNumeroNorma($opcionTresDesde,$opcionTresHasta,@filesToProcess);		#Opción Tres
+
+	if ($#ARGV >= 1) {
+		#significa que quiere filtrar por algo más
+		%filteredDataHash = &applyFilterKeyword(@filteredData);
+		#Y esto que sigue no lo puedo meter en una funcion porque le tendría que pasar un hash y un array
+		foreach my $theKey (sort { $filteredDataHash{$b} <=> $filteredDataHash{$a} } keys %filteredDataHash) {
+   			printf "%-8s %s\n", $theKey, $filteredDataHash{$theKey};
+		}
+	}
+	else{
+		#ordenar cronológicamente
+	}
 
 	&menuPreguntaSiSeguirConsultando;
+}
+
+sub applyFilterKeyword {
+	my (@filteredData) = @_;
+	my (%retvalhash,$causante,$extracto,@wordsCausante,@wordsExtracto);
+
+	foreach $lineOfData (@filteredData) {
+		my $totalPowerOfTheLineOfData = 0;
+		$causante = `echo "$lineOfData" | cut -d ';' -f 5`;
+		$extracto = `echo "$lineOfData" | cut -d ';' -f 6`;
+
+		@wordsCausante = split(" ",$causante);
+		@wordsExtracto = split(" ",$extracto);
+
+		foreach $word (@wordsCausante) {
+			#por cada vez que encuentre la palabra en el causante le sumo 10
+			if ($ARGV[1] eq $word) {
+				$totalPowerOfTheLineOfData += 10;
+			}
+		}
+		foreach $word (@wordsExtracto) {
+			#Lo mismo que el anterior pero ahora con el extracto, aca le sumo 1
+			if ($ARGV[1] eq $word) {
+				$totalPowerOfTheLineOfData += 1;
+			}
+		}
+		$retvalhash{$lineOfData} = $totalPowerOfTheLineOfData;
+	}
+	return (%retvalhash);
 }
 
 sub applyFilterNumeroNorma {
 	#acá ya me voy a tener que meter adentro del archivo
 	my ($numeroNormaDesde,$numeroNormaHasta,@filesToProcess) = @_;
-	my (@retval);
-
-	if ($opcionTresDesde == -1){
+	my (@retval, @currentlyFiltering,@chompedFiltering);
+	
+	if ($numeroNormaDesde == -1){
 		foreach (@filesToProcess){
 			push (@retval,`cat $_`);
-		}
+		}		
 		return (@retval);
 	}
 	else{
-		foreach (@filesToProcess){			
-			$numeroDeNormaSacado = `cut -d ';' -f 3 $_`;
-			print "$numeroDeNormaSacado";
+		foreach (@filesToProcess){
+			push (@currentlyFiltering,`cat $_`);			
 		}
-	}
+		foreach (@currentlyFiltering){
+			#le saco los espacios
+			chomp($_);		
+			push (@chompedFiltering,$_);
+		}
+		foreach $filteredLine (@chompedFiltering){
+			$numeroDeNormaSacado = `echo "$filteredLine" | cut -d ';' -f 3`;
+			chomp($numeroDeNormaSacado);
+			if ( ($numeroDeNormaSacado >= $numeroNormaDesde) and ($numeroDeNormaSacado <= $numeroNormaHasta) ){
+				push (@retval, $filteredLine);
+			}
+		}
+		return (@retval);
+	}	
 }
 
 sub applyFilterCodigoNorma {
@@ -128,12 +184,13 @@ sub applyFilterYear {
 	my (@retval, @filesWithTheYears, @partialFiles,$year);
 
 	foreach $firstPartDir (@filesToProcess){
+		my (@completeDir);	#como para que se resetee
 		@partialFiles = `ls $firstPartDir`;
-		foreach $lastPartDir (@partialFiles){
+		foreach $lastPartDir (@partialFiles){			
 			$var = join('',$firstPartDir,$lastPartDir);
 			chomp ($var);
 			push( @completeDir,$var );
-		}		
+		}
 		push(@filesWithTheYears,@completeDir);
 	}
 
@@ -191,7 +248,8 @@ sub setOptionValuesConsulta {
 	($flagUno, $flagDos, $flagTres, $flagCuatro, $flagCinco) = @_;
 	#Ahora pregunto que valor quiere por cada opción elegida
 	if ($flagUno){
-			print "\nElija un tipo de norma\n";
+			print "Elija un tipo de norma\n";
+			print ">";
 			$opcionUno = <STDIN>;
 			chomp($opcionUno);
 	}
@@ -200,10 +258,12 @@ sub setOptionValuesConsulta {
 	}
 
 	if ($flagDos){		
-		print "Desde:\n";
+		print "Año desde:\n";
+		print ">";
 		$desde = <STDIN>;
 		chomp($desde);
-		print "Hasta:\n";
+		print "Año hasta:\n";
+		print ">";
 		$hasta = <STDIN>;
 		chomp($hasta);
 		@opcionDos = ($desde, $hasta);
@@ -213,13 +273,15 @@ sub setOptionValuesConsulta {
 	}
 
 	if ($flagTres){
-		print "Desde:\n";
+		print "Número de norma desde:\n";
+		print ">";
 		$desde = <STDIN>;
 		chomp($desde);
-		print "Hasta:\n";
+		print "Número de norma hasta:\n";
+		print ">";
 		$hasta = <STDIN>;
 		chomp($hasta);
-		@opcionDos = ($desde, $hasta);
+		@opcionTres = ($desde, $hasta);
 	}
 	else{
 		@opcionTres = (-1,-1);	#Como para que elija todas
@@ -227,6 +289,7 @@ sub setOptionValuesConsulta {
 
 	if ($flagCuatro){
 		print "Escriba la gestión a buscar:\n";
+		print ">";
 		$opcionCuatro = <STDIN>;
 		chomp($opcionCuatro);
 	}
@@ -236,6 +299,7 @@ sub setOptionValuesConsulta {
 
 	if ($flagCinco){
 		print "Escriba emisor a buscar:\n";
+		print ">";
 		$opcionCinco = <STDIN>;
 		chomp($opcionCinco);
 	}
@@ -243,7 +307,7 @@ sub setOptionValuesConsulta {
 		$opcionCinco = "";
 	}
 
-	@retval = ($opcionUno,@opcionDos,@opcionTres,$opcionCuatro,$opcionCinco);
+	@retval = ($opcionUno,$opcionDos[0],$opcionDos[1],$opcionTres[0],$opcionTres[1],$opcionCuatro,$opcionCinco);
 }
 
 sub getflagsConsulta {
@@ -264,6 +328,7 @@ sub getflagsConsulta {
 		print "3_Número de norma (todas, rango)\n";
 		print "4_Gestión (todas, una)\n";
 		print "5_Emisor (todos, uno)\n";
+		print ">";
 		#Y aca el usuario escribe cuales quiere y lo meto en un array
 		$opcionesTipeadas = <STDIN>;
 		@opcionesElegidas = split(/\s/, $opcionesTipeadas);
@@ -306,7 +371,7 @@ sub getflagsConsulta {
 sub menuPreguntaSiSeguirConsultando {
 	my($opcionElegida);
 
-	print "\n¿Desea realizar otra consulta?[S/N]\n";
+	print "¿Desea realizar otra consulta?[S/N]\n";
 	$opcionElegida = <STDIN>;
 	$opcionElegida = uc $opcionElegida;
 	chomp($opcionElegida);
