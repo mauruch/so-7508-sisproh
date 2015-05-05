@@ -88,14 +88,44 @@ sub mostrarDataConsultas {
 		%filteredDataHash = &applyFilterKeyword(@filteredData);
 		#Y esto que sigue no lo puedo meter en una funcion porque le tendría que pasar un hash y un array
 		foreach my $theKey (sort { $filteredDataHash{$b} <=> $filteredDataHash{$a} } keys %filteredDataHash) {
-   			printf "%-8s %s\n", $theKey, $filteredDataHash{$theKey};
+   			if ($filteredDataHash{$theKey} > 0) {
+   				my @keyArrayed = split (";", $theKey);
+   				#TODO tengo el codigo de emisor pero no el emisor, de ultima leo el archivo y me armo el hash
+   				print "$keyArrayed[12] EMISOR($keyArrayed[13]) $keyArrayed[2]/$keyArrayed[3] $keyArrayed[11] $keyArrayed[1] Peso=$filteredDataHash{$theKey}\n";
+   				print "$keyArrayed[4]\n";
+   				print "$keyArrayed[5]\n";
+   				if ($ARGV[0] eq '-cg') {
+   					#Y aca debería escribir en un archivo
+   				}
+			}
 		}
 	}
 	else{
 		#ordenar cronológicamente
+		%filteredDataHash = &makeHashWithDates(@filteredData);
+		foreach my $theKey (sort { join('', (split '/', $a)[2,1,0]) cmp join('', (split '/', $b)[2,1,0]) } keys %filteredDataHash) {
+			   	#TODO tengo el codigo de emisor pero no el emisor, de ultima leo el archivo y me armo el hash
+   				print "$keyArrayed[12] EMISOR($keyArrayed[13]) $keyArrayed[2]/$keyArrayed[3] $keyArrayed[11] $keyArrayed[1]\n";
+   				print "$keyArrayed[4]\n";
+   				print "$keyArrayed[5]\n";
+   				if ($ARGV[0] eq '-cg') {
+   					#Y aca debería escribir en un archivo
+   				}
+		}
 	}
 
 	&menuPreguntaSiSeguirConsultando;
+}
+
+sub makeHashWithDates {
+	my (@filteredData) = @_;
+	my (%retvalhash,$date,$extracto,@wordsCausante,@wordsExtracto);
+
+	foreach $lineOfData (@filteredData) {		
+		$date = `echo "$lineOfData" | cut -d ';' -f 1`;
+		$retvalhash{$lineOfData} = $date;
+	}
+	return (%retvalhash);	
 }
 
 sub applyFilterKeyword {
