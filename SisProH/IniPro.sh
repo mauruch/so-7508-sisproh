@@ -7,8 +7,6 @@ INSPROCONF="$CONFDIR/InsPro.conf"
 chmod +x $GRUPO/Glog.sh
 chmod +rw $INSPROCONF
 
-echo $INSPROCONF
-
 #Verifico que no este corriendo un proceso IniPro.sh
 if pgrep "IniPro.sh"
 then
@@ -22,100 +20,74 @@ fi
 #Verifico que las variables de ambiente no esten ya seteadas
 #Seteo variables de entorno tomadas del archivo InsPro.conf
 
-while read line
-do
-	IFS='=' read VAR PATH <<< "$VARIABLE"
-	echo "$VAR"
-	if [ -n "$VAR" ]; then
-		echo "ambiente ya inicializado, si quiere reiniciar termine su sesión e ingrese nuevamente"
-		$GRUPO/Glog.sh "$0" 'ambiente ya inicializado, si quiere reiniciar termine su sesión e ingrese nuevamente' 'ERR'
-		exit 1
-	fi  
-done < $INSPROCONF
-
-
-
-
+#BINDIR=/faf/
 ################################################################################################
 ################################## SETEO VARIABLES DE ENTORNO  #################################
 ################################################################################################
 
-#MOSTRAR, LOGUEAR Y EXPORTAR VARIABLE CONFDIR Y SUS ARCHIVOS
-IFS='=' read var path <<< "$CONFDIR"
-LISTARCHCONFDIR=$(ls $path)
-echo "Directorio de Configuración: $var - path=$path - lista de archivos=$LISTARCHCONFDIR"
-$GRUPO/Glog.sh "$0" "Directorio de Configuración: $var - path=$path - lista de archivos=$LISTARCHCONFDIR" 'INFO'
-
 #MOSTRAR, LOGUEAR Y EXPORTAR VARIABLE BINDIR Y SUS ARCHIVOS
 BINDIR=$(grep "BINDIR" "$INSPROCONF")
 export $BINDIR
-IFS='=' read var path <<< "$BINDIR"
-LISTARCHBINDIR=$(ls $path)
-echo "Directorio de Ejecutables: $var - path=$path - lista de archivos=$LISTARCHBINDIR"
-$GRUPO/Glog.sh "$0" "Directorio de Ejecutables: $var - path=$path - lista de archivos=$LISTARCHBINDIR" 'INFO'
 
 #MOSTRAR, LOGUEAR Y EXPORTAR VARIABLE MAEDIR Y SUS ARCHIVOS
 MAEDIR=$(grep "MAEDIR" "$INSPROCONF")
 export $MAEDIR
-IFS='=' read var path <<< "$MAEDIR"
-LISTARCHMAEDIR=$(ls $path)
-echo "Directorio de Maestros y Tablas: $var - path=$path - lista de archivos=$LISTARCHMAEDIR"
-$GRUPO/Glog.sh "$0" "Directorio de Maestros y Tablas: $var - path=$path - lista de archivos=$LISTARCHMAEDIR" 'INFO'
 
 #MOSTRAR, LOGUEAR Y EXPORTAR VARIABLE NOVEDIR
 NOVEDIR=$(grep "NOVEDIR" "$INSPROCONF")
 export $NOVEDIR
-IFS='=' read var path <<< "$NOVEDIR"
-echo "Directorio de recepción de documentos para protocolización: $var"
-$GRUPO/Glog.sh "$0" "Directorio de recepción de documentos para protocolización: $var" 'INFO'
 
 #MOSTRAR, LOGUEAR Y EXPORTAR VARIABLE ACEPDIR
 ACEPDIR=$(grep "ACEPDIR" "$INSPROCONF")
 export $ACEPDIR
-IFS='=' read var path <<< "$ACEPDIR"
-echo "Directorio de Archivos Aceptados: $var"
-$GRUPO/Glog.sh "$0" "Directorio de Archivos Aceptados: $var" 'INFO'
 
 #MOSTRAR, LOGUEAR Y EXPORTAR VARIABLE RECHDIR
 RECHDIR=$(grep "RECHDIR" "$INSPROCONF")
 export $RECHDIR
-IFS='=' read var path <<< "$RECHDIR"
-echo "Directorio de Archivos Rechazados: $var"
-$GRUPO/Glog.sh "$0" "Directorio de Archivos Rechazados: $var" 'INFO'
 
 #MOSTRAR, LOGUEAR Y EXPORTAR VARIABLE PROCDIR
 PROCDIR=$(grep "PROCDIR" "$INSPROCONF")
 export $PROCDIR
-IFS='=' read var path <<< "$PROCDIR"
-echo "Directorio de Archivos Protocolizados: $var"
-$GRUPO/Glog.sh "$0" "Directorio de Archivos Protocolizados: $var" 'INFO'
 
 #MOSTRAR, LOGUEAR Y EXPORTAR VARIABLE INFODIR
 INFODIR=$(grep "INFODIR" "$INSPROCONF")
 export $INFODIR
-IFS='=' read var path <<< "$INFODIR"
-echo "Directorio para informes y estadísticas: $var"
-$GRUPO/Glog.sh "$0" "Directorio para informes y estadísticas: $var" 'INFO'
 
 #MOSTRAR, LOGUEAR Y EXPORTAR VARIABLE DUPDIR
 DUPDIR=$(grep "DUPDIR" "$INSPROCONF")
 export $DUPDIR
-IFS='=' read var path <<< "$DUPDIR"
-echo "Nombre para el repositorio de duplicados: $var"
-$GRUPO/Glog.sh "$0" "Nombre para el repositorio de duplicados: $var" 'INFO'
 
 #MOSTRAR, LOGUEAR Y EXPORTAR VARIABLE LOGDIR Y SUS ARCHIVOS
 LOGDIR=$(grep "LOGDIR" "$INSPROCONF")
 export $LOGDIR
-IFS='=' read var path <<< "$LOGDIR"
-LISTARCHLOGDIR=$(ls $path)
-echo "Directorio para Archivos de Log: $var - path=$path - lista de archivos=$LISTARCHLOGDIR"
-$GRUPO/Glog.sh "$0" "Directorio para Archivos de Log: $var - path=$path - lista de archivos=$LISTARCHLOGDIR" 'INFO'
 
 
 
 #Seteo variable PATH
 export PATH="$2" #TODO:review
+
+
+array_key=( "$CONFDIR" "$BINDIR" "$MAEDIR" "$NOVEDIR" "$DATASIZE" "$ACEPDIR" "$RECHDIR" "$PROCDIR" "$INFODIR" "$DUPDIR" "$LOGDIR" "$LOGSIZE" )
+
+array_value=( "Directorio de Configuración" "Directorio de Ejecutables" "Directorio de Maestros y Tablas" "Directorio de recepción de documentos para protocolización" "Espacio mínimo libre para arribos [Mb]" "Directorio de Archivos Aceptados" "Directorio de Archivos Rechazados" "Directorio de Archivos Protocolizados" "Directorio para informes y estadísticas" "Nombre para el repositorio de duplicados" "Directorio para Archivos de Log" "Tamaño máximo para los archivos de log del sistema [Kb]")
+
+elements=${#array_key[@]}
+
+for (( i=0;i<$elements;i++ )); do
+
+	KEY=${array_key[${i}]}
+
+	echo -e "${array_value[${i}]}: $KEY \n"
+
+	#listar los archivos cuando es necesario 
+	if [ "$KEY" = "$CONFDIR" ] || [ "$KEY" = "$BINDIR" ] || [ "$KEY" = "$MAEDIR" ]	|| [ "$KEY" = "$LOGDIR" ] ; then
+		echo "TRATANDO DE LISTAR: $KEY"
+		ls "$KEY"
+	fi
+	
+done
+
+echo -e "\n"
 
 ################################################################################################
 ############################## FIN DE SETEO VARIABLES DE ENTORNO  ##############################
