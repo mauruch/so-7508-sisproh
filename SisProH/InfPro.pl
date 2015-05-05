@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/bin/perl
 #Comando para la Obtención de Informes y estadísticas
 
 #• Es el cuarto en orden de ejecución
@@ -17,7 +17,7 @@ $checkInfodir = "INFODIR";
 $checkProcdir = "PROCDIR";
 #Y lo meto en un array para usar un foreach, porque el foreach es lo mas grande que hay, como manaos
 @arrayDeCheckeos = ($checkEmisores,$checkNormas,$checkGestiones,$checkInfodir,$checkProcdir);
-my $count_args = $#ARGV + 1;
+my $count_args = $#ARGV + 1;	#sirve o se borra?
 
 &checkeos;
 &decideWhatToDo;
@@ -72,7 +72,7 @@ sub mostrarDataConsultas {
 	my ($opcionUno,$opcionDosDesde,$opcionDosHasta,$opcionTresDesde,$opcionTresHasta,$opcionCuatro,$opcionCinco) = @_;
 	my (@gestionDirectory, @gestionDirectoryAProcesar);
 	my ($currentDirToProcess);
-	my(@filesToProcess, @filteredData);
+	my(@filesToProcess, @filteredData,@sortedData);
 	####Ahora que tengo todo debería mostrarle la data
 	@filesToProcess = &applyFilterGestion($opcionCuatro);											#Opción Cuatro
 	@filesToProcess = &applyFilterEmisor($opcionCinco, @filesToProcess);							#Opción Cinco
@@ -80,14 +80,27 @@ sub mostrarDataConsultas {
 	@filesToProcess = &applyFilterCodigoNorma($opcionUno, @filesToProcess);							#Opción Uno
 	@filteredData = &applyFilterNumeroNorma($opcionTresDesde,$opcionTresHasta,@filesToProcess);		#Opción Tres
 
+	if ($#ARGV >= 1) {
+		#significa que quiere filtrar por algo más
+		@filteredData = &applyFilterKeyword(@filteredData);
+		@sortedData = &applySortByWeight(@filteredData);
+	}
+	else{
+		#ordenar cronológicamente
+	}
+
 	&menuPreguntaSiSeguirConsultando;
+}
+
+sub applyFilterKeyword {
+	
 }
 
 sub applyFilterNumeroNorma {
 	#acá ya me voy a tener que meter adentro del archivo
 	my ($numeroNormaDesde,$numeroNormaHasta,@filesToProcess) = @_;
-	my (@retval);
-	print "$numeroNormaDesde";
+	my (@retval, @currentlyFiltering,@chompedFiltering);
+	
 	if ($numeroNormaDesde == -1){
 		foreach (@filesToProcess){
 			push (@retval,`cat $_`);
@@ -95,12 +108,23 @@ sub applyFilterNumeroNorma {
 		return (@retval);
 	}
 	else{
-		foreach (@filesToProcess){			
-			$numeroDeNormaSacado = `cut -d ';' -f 3 $_`;
-			#TODO falta aca
-			print "$numeroDeNormaSacado";
+		foreach (@filesToProcess){
+			push (@currentlyFiltering,`cat $_`);			
 		}
-	}
+		foreach (@currentlyFiltering){
+			#le saco los espacios
+			chomp($_);		
+			push (@chompedFiltering,$_);
+		}
+		foreach $filteredLine (@chompedFiltering){
+			$numeroDeNormaSacado = `echo "$filteredLine" | cut -d ';' -f 3`;
+			chomp($numeroDeNormaSacado);
+			if ( ($numeroDeNormaSacado >= $numeroNormaDesde) and ($numeroDeNormaSacado <= $numeroNormaHasta) ){
+				push (@retval, $filteredLine);
+			}
+		}
+		return (@retval);
+	}	
 }
 
 sub applyFilterCodigoNorma {
