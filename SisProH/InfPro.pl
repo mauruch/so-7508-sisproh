@@ -128,8 +128,7 @@ sub mostrarDataConsultas {
    				print "$keyArrayed[5]\n";   						
    				if ($ARGV[0] eq '-cg') {
    					#Y aca debería escribir en un archivo
-					print FILE "$keyArrayed[12] EMISOR $keyArrayed[13] $keyArrayed[2] $keyArrayed[3] $keyArrayed[11] $keyArrayed[1] $keyArrayed[4] $keyArrayed[5] $keyArrayed[10]\n";
-   				}#Fin del guardado
+				print FILE "$codigoNorma $emisor $codigoEmisor $keyArrayed[2] $keyArrayed[3] $codigoGestion $keyArrayed[1] $keyArrayed[4] $keyArrayed[5] $keyArrayed[10]\n";   				}#Fin del guardado
 			}
 		}		
 	}
@@ -153,7 +152,7 @@ sub mostrarDataConsultas {
 			print "$keyArrayed[5]\n";
 			if ($ARGV[0] eq '-cg') {
 				#Y aca debería escribir en un archivo
-				print FILE "$keyArrayed[12] EMISOR $keyArrayed[13] $keyArrayed[2] $keyArrayed[3] $keyArrayed[11] $keyArrayed[1] $keyArrayed[4] $keyArrayed[5] $keyArrayed[10]\n";
+				print FILE "$codigoNorma $emisor $codigoEmisor $keyArrayed[2] $keyArrayed[3] $codigoGestion $keyArrayed[1] $keyArrayed[4] $keyArrayed[5] $keyArrayed[10]\n";
 			}
 		}
 	}
