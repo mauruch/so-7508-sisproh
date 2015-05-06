@@ -82,14 +82,14 @@ diasMeses=(31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31)
 				var=${diasMeses[$mes]}
 				if [ $dia -gt $var ]
 				then	
-					return 0
+					return 1
 					
 				fi
 			else
-				return 0
+				return 1
 			fi
 		else
-			return 0
+			return 1
 
 		fi
 	
@@ -130,42 +130,6 @@ function valFormatoNombreArch(){
 			# "<cod_emisor>"
 			archivo='emisores.mae'
 	     		;;
-			5)
-			# "<fecha>"
-			# La fecha se valida según el rango de la gestión, 
-			# en el caso de ser la gestión actual, se toma la fecha de hoy
-			
-			validar=${validar//-//}
-			validar=$(date -d "$validar" +'%Y%d%m')
-			
-			desde=`grep $codGestion';' $MAEDIR/gestiones.mae | cut -d';' -f2 --output-delimiter=$'\n'`
-			hasta=`grep $codGestion';' $MAEDIR/gestiones.mae | cut -d';' -f3 --output-delimiter=$'\n'`
-			
-			valFecha $desde
-			if [ $? -eq 1 ]
-			then
-				desde=$(date -d "$desde" +'%Y%d%m'); 
-				
-				valFecha $hasta
-				if [ $? -eq 1 ]
-				then	
-					hasta=$(date -d "$hasta" +'%Y%d%m'); 
-					if [ $validar -gt $hasta ] || [ $validar -lt $desde ]
-					then
-						nombreValido=0
-					fi
-
-				else 
-					nombreValido=0
-					let cont=$cont+1
-				fi
-
-			else
-				nombreValido=0
-				let cont=$cont+1
-
-			fi
-		 	;;
 	  		esac
 
 			if [ $cont -eq 1 ] || [ $cont -eq 2 ] || [ $cont -eq 3 ]

@@ -13,12 +13,12 @@ use 5.010;
 #No lo entendí muy bien que hace el InfPro.pl así que hago lo que creo que pide:
 
 #Me fijo que esté inicializado el ambiente, o sea me fijo si existen las cosas con las que voy a trabajar
-$checkEmisores = "MAEDIR/emisores.mae";
-$checkNormas = "MAEDIR/normas.mae";
-$checkGestiones = "MAEDIR/gestiones.mae";
-$checkInfodir = "INFODIR";
-$INFODIR = "INFODIR";
-$checkProcdir = "PROCDIR";
+$checkEmisores = "$MAEDIR/emisores.mae";
+$checkNormas = "$MAEDIR/normas.mae";
+$checkGestiones = "$MAEDIR/gestiones.mae";
+$checkInfodir = "$INFODIR";
+$INFODIR = "$INFODIR";
+$checkProcdir = "$PROCDIR";
 #Y lo meto en un array para usar un foreach, porque el foreach es lo mas grande que hay, como manaos
 @arrayDeCheckeos = ($checkEmisores,$checkNormas,$checkGestiones,$checkInfodir,$checkProcdir);
 my $count_args = $#ARGV + 1;	#sirve o se borra?
