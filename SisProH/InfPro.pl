@@ -13,11 +13,13 @@ use 5.010;
 #No lo entendí muy bien que hace el InfPro.pl así que hago lo que creo que pide:
 
 #Me fijo que esté inicializado el ambiente, o sea me fijo si existen las cosas con las que voy a trabajar
+$MAEDIR = $ENV{'MAEDIR'};
+$INFODIR = $ENV{'INFODIR'};
+$PROCDIR = $ENV{'PROCDIR'};
 $checkEmisores = "$MAEDIR/emisores.mae";
 $checkNormas = "$MAEDIR/normas.mae";
 $checkGestiones = "$MAEDIR/gestiones.mae";
 $checkInfodir = "$INFODIR";
-$INFODIR = "$INFODIR";
 $checkProcdir = "$PROCDIR";
 #Y lo meto en un array para usar un foreach, porque el foreach es lo mas grande que hay, como manaos
 @arrayDeCheckeos = ($checkEmisores,$checkNormas,$checkGestiones,$checkInfodir,$checkProcdir);
@@ -84,8 +86,6 @@ sub mostrarDataConsultas {
 	@filesToProcess = &applyFilterCodigoNorma($opcionUno, @filesToProcess);							#Opción Uno
 	@filteredData = &applyFilterNumeroNorma($opcionTresDesde,$opcionTresHasta,@filesToProcess);		#Opción Tres
 
-
-
 	if ($ARGV[0] eq '-cg') {
 	#Y aca debería escribir en un archivo
 		my $salir = 0;
@@ -114,10 +114,18 @@ sub mostrarDataConsultas {
 		foreach my $theKey (sort { $filteredDataHash{$b} <=> $filteredDataHash{$a} } keys %filteredDataHash) {
    			if ($filteredDataHash{$theKey} > 0) {
    				my @keyArrayed = split (";", $theKey);
+				$emisor = "pepe";
+				$codigoGestion = `echo $keyArrayed[0] | cut -d '_' -f 1`;
+				chomp ($codigoGestion);
+				$codigoNorma = `echo $keyArrayed[0] | cut -d '_' -f 2`;
+				chomp ($codigoNorma);
+				$codigoEmisor = `echo $keyArrayed[0] | cut -d '_' -f 3`;
+				chomp ($codigoEmisor);
    				#TODO tengo el codigo de emisor pero no el emisor, de ultima leo el archivo y me armo el hash
-   				print "$keyArrayed[12] EMISOR($keyArrayed[13]) $keyArrayed[2]/$keyArrayed[3] $keyArrayed[11] $keyArrayed[1] Peso=$filteredDataHash{$theKey}\n";
+   				print "############################################################################################\n";  		
+   				print "$codigoNorma $emisor($codigoEmisor) $keyArrayed[2]/$keyArrayed[3] $codigoGestion $keyArrayed[1] Peso=$filteredDataHash{$theKey}\n";
    				print "$keyArrayed[4]\n";
-   				print "$keyArrayed[5]\n";
+   				print "$keyArrayed[5]\n";   						
    				if ($ARGV[0] eq '-cg') {
    					#Y aca debería escribir en un archivo
 					print FILE "$keyArrayed[12] EMISOR $keyArrayed[13] $keyArrayed[2] $keyArrayed[3] $keyArrayed[11] $keyArrayed[1] $keyArrayed[4] $keyArrayed[5] $keyArrayed[10]\n";
@@ -130,8 +138,17 @@ sub mostrarDataConsultas {
 		%filteredDataHash = &makeHashWithDates(@filteredData);
 		#http://stackoverflow.com/questions/2491471/how-can-i-sort-dates-in-perl
 		foreach my $theKey (sort { join('', (split '/', $a)[2,1,0]) cmp join('', (split '/', $b)[2,1,0]) } keys %filteredDataHash) {
-	   		#TODO tengo el codigo de emisor pero no el emisor, de ultima leo el archivo y me armo el hash
-			print "$keyArrayed[12] EMISOR($keyArrayed[13]) $keyArrayed[2]/$keyArrayed[3] $keyArrayed[11] $keyArrayed[1]\n";
+			my @keyArrayed = split (";", $theKey);
+			$emisor = "pepe";
+			$codigoGestion = `echo $keyArrayed[0] | cut -d '_' -f 1`;
+			chomp ($codigoGestion);
+			$codigoNorma = `echo $keyArrayed[0] | cut -d '_' -f 2`;
+			chomp ($codigoNorma);
+			$codigoEmisor = `echo $keyArrayed[0] | cut -d '_' -f 3`;
+			chomp ($codigoEmisor);
+			#TODO tengo el codigo de emisor pero no el emisor, de ultima leo el archivo y me armo el hash
+			print "############################################################################################\n";  		
+   			print "$codigoNorma $emisor($codigoEmisor) $keyArrayed[2]/$keyArrayed[3] $codigoGestion $keyArrayed[1]\n";
 			print "$keyArrayed[4]\n";
 			print "$keyArrayed[5]\n";
 			if ($ARGV[0] eq '-cg') {
@@ -152,8 +169,9 @@ sub makeHashWithDates {
 	my (@filteredData) = @_;
 	my (%retvalhash,$date,$extracto,@wordsCausante,@wordsExtracto);
 
-	foreach $lineOfData (@filteredData) {		
-		$date = `echo "$lineOfData" | cut -d ';' -f 1`;
+	foreach $lineOfData (@filteredData) {
+		$date = `echo "$lineOfData" | cut -d ';' -f 2`;	#veo que esta en la segunda, ya que en la primera está la fuente
+		chomp ($date);
 		$retvalhash{$lineOfData} = $date;
 	}
 	return (%retvalhash);	
@@ -196,7 +214,7 @@ sub applyFilterNumeroNorma {
 	if ($numeroNormaDesde == -1){
 		foreach (@filesToProcess){
 			push (@retval,`cat $_`);
-		}		
+		}
 		return (@retval);
 	}
 	else{
@@ -229,11 +247,11 @@ sub applyFilterCodigoNorma {
 	}
 
 	foreach $totalPath (@filesToProcess){
-		$norma = `echo $totalPath | cut -d '/' -f 3`;	#el cut es para files
-		chomp($norma);		
-		$norma = `echo $norma | cut -d '.' -f 2`;
+		$norma = `basename $totalPath`;	#el cut es para files será basename?		
 		chomp($norma);
-		if (index($norma, $normaFilter) != -1){
+		$norma = `echo $norma | cut -d '.' -f 2`;
+		chomp($norma);		
+		if (index($norma, $normaFilter) != -1){			
 			push (@retval, $totalPath);
 		}
 	}
@@ -256,10 +274,10 @@ sub applyFilterYear {
 	}
 
 	foreach $totalPath (@filesWithTheYears){
-		$year = `echo $totalPath | cut -d '/' -f 3`;	#el cut es para files
+		$year = `basename $totalPath`;	#el cut es para files		
 		chomp($year);
 		$year = `echo $year | cut -d '.' -f 1`;
-		chomp($year);
+		chomp($year);		
 		if (($year >= $yearsWantedFrom) and ($year <=$yearsWantedTo)){
 			push (@retval, $totalPath);
 		}		
@@ -283,13 +301,13 @@ sub applyFilterGestion {
 	$gestionAFiltrar = $_;
 	my (@retval);
 	#TODO cambiar el hardcodeo
-	my (@gestionDirectory) = `ls PROCDIR`;
-	my ($baseDir) = "PROCDIR/";
+	my (@gestionDirectory) = `ls $PROCDIR`;
+	my ($baseDir) = "$PROCDIR/";
 
 	if ($gestionAFiltrar ne ""){		
 		foreach (@gestionDirectory){
 			chomp ($_);
-			if ($_ eq $gestionAFiltrar){
+			if ($_ eq $gestionAFiltrar and $_ ne "proc"){
 				@retval = ("$baseDir$_/");
 			}
 		}
@@ -297,7 +315,9 @@ sub applyFilterGestion {
 	else {
 		foreach (@gestionDirectory){
 			chomp ($_);
-			push (@retval, "$baseDir$_/");
+			if ($_ ne "proc"){
+				push (@retval, "$baseDir$_/");
+			}
 		}
 	}
 	@retval;	#Devuelve cosas como PROCDIR/Fernandez2/

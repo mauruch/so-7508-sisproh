@@ -23,7 +23,7 @@
 #
 
 #creo un placeholder para que lo escriba en el mismo directorio
-logPathDefault=$LOGDIR/$insproLog
+logPathDefault=$LOGDIR"/Glog.sh.log"
 #placeholder de usuario
 user=$USERNAME
 

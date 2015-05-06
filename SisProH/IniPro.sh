@@ -43,56 +43,56 @@ fi
 ################################################################################################
 
 #MOSTRAR, LOGUEAR Y EXPORTAR VARIABLE LOGDIR Y SUS ARCHIVOS
-echo "Expotando variable LOGDIR -> $LOGDIR"
-$GRUPO/Glog.sh "IniPro.sh" "Expotando variable LOGDIR -> $LOGDIR" 'INFO'
+echo "Exportando variable LOGDIR -> $LOGDIR"
+$GRUPO/Glog.sh "IniPro.sh" "Exportando variable LOGDIR -> $LOGDIR" 'INFO'
 
 #MOSTRAR, LOGUEAR Y EXPORTAR VARIABLE BINDIR Y SUS ARCHIVOS
 BINDIR=$(grep "BINDIR" "$INSPROCONF")
-echo "Expotando variable BINDIR -> $BINDIR"
+echo "Exportando variable BINDIR -> $BINDIR"
 export $BINDIR
-$GRUPO/Glog.sh "IniPro.sh" "Expotando variable BINDIR -> $BINDIR" 'INFO'
+$GRUPO/Glog.sh "IniPro.sh" "Exportando variable BINDIR -> $BINDIR" 'INFO'
 
 #MOSTRAR, LOGUEAR Y EXPORTAR VARIABLE MAEDIR Y SUS ARCHIVOS
 MAEDIR=$(grep "MAEDIR" "$INSPROCONF")
-echo "Expotando variable MAEDIR -> $MAEDIR"
+echo "Exportando variable MAEDIR -> $MAEDIR"
 export $MAEDIR
-$GRUPO/Glog.sh "IniPro.sh" "Expotando variable MAEDIR -> $MAEDIR" 'INFO'
+$GRUPO/Glog.sh "IniPro.sh" "Exportando variable MAEDIR -> $MAEDIR" 'INFO'
 
 #MOSTRAR, LOGUEAR Y EXPORTAR VARIABLE NOVEDIR
 NOVEDIR=$(grep "NOVEDIR" "$INSPROCONF")
-echo "Expotando variable NOVEDIR -> $NOVEDIR"
+echo "Exportando variable NOVEDIR -> $NOVEDIR"
 export $NOVEDIR
-$GRUPO/Glog.sh "IniPro.sh" "Expotando variable NOVEDIR -> $NOVEDIR" 'INFO'
+$GRUPO/Glog.sh "IniPro.sh" "Exportando variable NOVEDIR -> $NOVEDIR" 'INFO'
 
 #MOSTRAR, LOGUEAR Y EXPORTAR VARIABLE ACEPDIR
 ACEPDIR=$(grep "ACEPDIR" "$INSPROCONF")
-echo "Expotando variable ACEPDIR -> $ACEPDIR"
+echo "Exportando variable ACEPDIR -> $ACEPDIR"
 export $ACEPDIR
-$GRUPO/Glog.sh "IniPro.sh" "Expotando variable ACEPDIR -> $ACEPDIR" 'INFO'
+$GRUPO/Glog.sh "IniPro.sh" "Exportando variable ACEPDIR -> $ACEPDIR" 'INFO'
 
 #MOSTRAR, LOGUEAR Y EXPORTAR VARIABLE RECHDIR
 RECHDIR=$(grep "RECHDIR" "$INSPROCONF")
-echo "Expotando variable RECHDIR -> $RECHDIR"
+echo "Exportando variable RECHDIR -> $RECHDIR"
 export $RECHDIR
-$GRUPO/Glog.sh "IniPro.sh" "Expotando variable RECHDIR -> $RECHDIR" 'INFO'
+$GRUPO/Glog.sh "IniPro.sh" "Exportando variable RECHDIR -> $RECHDIR" 'INFO'
 
 #MOSTRAR, LOGUEAR Y EXPORTAR VARIABLE PROCDIR
 PROCDIR=$(grep "PROCDIR" "$INSPROCONF")
-echo "Expotando variable PROCDIR -> $PROCDIR"
+echo "Exportando variable PROCDIR -> $PROCDIR"
 export $PROCDIR
-$GRUPO/Glog.sh "IniPro.sh" "Expotando variable PROCDIR -> $PROCDIR" 'INFO'
+$GRUPO/Glog.sh "IniPro.sh" "Exportando variable PROCDIR -> $PROCDIR" 'INFO'
 
 #MOSTRAR, LOGUEAR Y EXPORTAR VARIABLE INFODIR
 INFODIR=$(grep "INFODIR" "$INSPROCONF")
-echo "Expotando variable INFODIR -> $INFODIR"
+echo "Exportando variable INFODIR -> $INFODIR"
 export $INFODIR
-$GRUPO/Glog.sh "IniPro.sh" "Expotando variable INFODIR -> $INFODIR" 'INFO'
+$GRUPO/Glog.sh "IniPro.sh" "Exportando variable INFODIR -> $INFODIR" 'INFO'
 
 #MOSTRAR, LOGUEAR Y EXPORTAR VARIABLE DUPDIR
 DUPDIR=$(grep "DUPDIR" "$INSPROCONF")
-echo "Expotando variable DUPDIR -> $DUPDIR"
+echo "Exportando variable DUPDIR -> $DUPDIR"
 export $DUPDIR
-$GRUPO/Glog.sh "IniPro.sh" "Expotando variable DUPDIR -> $DUPDIR" 'INFO'
+$GRUPO/Glog.sh "IniPro.sh" "Exportando variable DUPDIR -> $DUPDIR" 'INFO'
 
 array_key=( "$CONFDIR" "$BINDIR" "$MAEDIR" "$NOVEDIR" "$ACEPDIR" "$RECHDIR" "$PROCDIR" "$INFODIR" "$DUPDIR" "$LOGDIR" )
 
@@ -233,20 +233,17 @@ preguntarActivarRecPro()
 			#TODO: Ver si esta bien explicado como correr el Stop.sh
 			echo "El proceso RecPro.sh ya ha sido ejecutado y se encuentra corriendo."
 			echo "Para detener el proceso RecPro activo, ejecute el comando $GRUPO/Stop.sh"
-			$GRUPO/Glog.sh "IniPro.sh" 'El proceso RecPro.sh ya ha sido ejecutado y se encuentra corriendo' 'ERR'
-			exit 1
+			$GRUPO/Glog.sh "IniPro.sh" 'El proceso RecPro.sh ya ha sido ejecutado y se encuentra corriendo' 'ERR'			
 		else
-			$BINDIR/RecPro.sh
+			$BINDIR/RecPro.sh &
 			RECPROPROCESSID=$(/bin/ps -fu $USER | grep "RecPro.sh" | grep -v "grep" | awk '{print $2}')
 			echo "RecPro corriendo bajo el no.: $RECPROPROCESSID"
-			$GRUPO/Glog.sh "IniPro.sh" "RecPro corriendo bajo el no.: $RECPROPROCESSID" 'INFO'
-			exit 1
+			$GRUPO/Glog.sh "IniPro.sh" "RecPro corriendo bajo el no.: $RECPROPROCESSID" 'INFO'			
 		fi
 	elif [ "$activarRecPro" = "no" ]; then
 		#TODO: Ver si esta bien explicado como correr el Start.sh
 		echo "Usted no ha querido ejecutar el proceso RecPro.sh."
-		echo "Podra ejecutarlo luego corriendo el proceso $GRUPO/Start.sh"
-		exit 1
+		echo "Podra ejecutarlo luego corriendo el proceso $GRUPO/Start.sh"		
 	else
 		echo "$activarRecPro no es un comando valido."
 		preguntarActivarRecPro
