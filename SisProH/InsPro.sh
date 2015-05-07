@@ -15,6 +15,13 @@ chmod +x RecPro.sh
 chmod +x Start.sh
 chmod +x Stop.sh
 
+
+#Te agrego esta línea para que el infpro no moleste con que le falta la carpeta de atrás como a la cucaracha
+if [ ! -d $CONFDIR ]
+then
+`mkdir $CONFDIR`
+fi
+
 ######## Funcion setDir() para que el usuario ingrese los directorios ######
 function setDir() {
 
