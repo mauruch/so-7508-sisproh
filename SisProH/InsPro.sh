@@ -16,6 +16,11 @@ chmod +x Start.sh
 chmod +x Stop.sh
 
 function instalarDesdeCualquierLugar(){
+if [ $PWD != $GRUPO ] && [ -d $GRUPO ]
+then
+	rm -r $GRUPO
+fi
+
 if [ ! -d $GRUPO ]
 then
 	`mkdir $GRUPO`
@@ -85,7 +90,7 @@ for (( i=0;i<11;i++)); do
 
 	#Checkeo si hay suficiente espacio
 	if [ $k = "DATASIZE" ]; then
-		finalSize=$(bash CheckSpaceDisk.sh)
+		finalSize=$(bash "$GRUPO/CheckSpaceDisk.sh")
 		eval $k=$finalSize
 		eval val=\${"$k"}
 		#export DATASIZE con el nuevo valor
@@ -174,7 +179,7 @@ do
 	clear
 
 	#llamo a la funcion para que imprima las variables
-	bash CheckSisProIns.sh "showVariables"
+	bash $GRUPO/CheckSisProIns.sh "showVariables"
 
 	echo "Estado de la instalación: LISTA"
 
@@ -239,14 +244,14 @@ echo -e "Instalando Archivos Maestros y Tablas \n"
 bash $GRUPO/Glog.sh "InsPro.sh" "Instalando Archivos Maestros y Tablas"
 
 #Nombre de la carpeta que contiene los datos
-dataDir="2015-1C-Datos/"
+dataDir="$GRUPO/2015-1C-Datos/"
 
 ###### 20.2 mueven los archivos maestros #######
 lsMaeResult=`ls $dataDir | grep '\.mae$'`
 	
 for f in $lsMaeResult; do
 	
-	bash Mover.sh "$dataDir$f" "$MAEDIR" "InsPro.sh"
+	bash $GRUPO/Mover.sh "$dataDir$f" "$MAEDIR" "InsPro.sh"
 done
 
 ###### 20.2  Se mueven los archivos tablas #######
@@ -254,7 +259,7 @@ lsTabResult=`ls $dataDir | grep '\.tab$'`
 
 for f in $lsTabResult; do
 	
-  bash Mover.sh "$dataDir$f" "$MAEDIR/tab" "InsPro.sh"
+  bash $GRUPO/Mover.sh "$dataDir$f" "$MAEDIR/tab" "InsPro.sh"
 done
 
 ###### 20.3 Mover los ejecutables y funciones  #######
@@ -264,7 +269,7 @@ lsScriptsResult=`ls | grep '\.\(sh\|pl\)$'`
 currentDirectory=`pwd`
 for f in $lsScriptsResult; do
   if [ $f != "Glog.sh" ] && [ $f != "Mover.sh" ]; then  
-    bash Mover.sh "$currentDirectory/$f" "$BINDIR" "InsPro.sh"
+    bash $GRUPO/Mover.sh "$currentDirectory/$f" "$BINDIR" "InsPro.sh"
   fi
 done
 
