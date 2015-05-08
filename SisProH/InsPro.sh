@@ -15,12 +15,27 @@ chmod +x RecPro.sh
 chmod +x Start.sh
 chmod +x Stop.sh
 
+function instalarDesdeCualquierLugar(){
+if [ ! -d $GRUPO ]
+then
+	`mkdir $GRUPO`
+	arrayAMover=(`ls`)
+
+	for f in ${arrayAMover[*]}; do
+		if [ ! $f = 'InsPro.sh' ]
+		then			
+			mv "$f" "$GRUPO"
+		fi
+	done
+	mv InsPro.sh $GRUPO
+fi
 
 #Te agrego esta línea para que el infpro no moleste con que le falta la carpeta de atrás como a la cucaracha
 if [ ! -d $CONFDIR ]
 then
-`mkdir $CONFDIR`
+	`mkdir $CONFDIR`
 fi
+}
 
 ######## Funcion setDir() para que el usuario ingrese los directorios ######
 function setDir() {
@@ -87,6 +102,7 @@ done
 
 #######################################
 #PRINCIPAL
+instalarDesdeCualquierLugar
 
 msgHeader="TP SO7508 Primer Cuatrimestre 2015. Tema H Copyright © Grupo 06"
 
