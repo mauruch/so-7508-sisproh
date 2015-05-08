@@ -208,6 +208,8 @@ read confirmInstall
 
 echo -e "\n"
 
+cd $GRUPO
+
 
 ######## 20. Instalación #################
 
@@ -244,7 +246,7 @@ echo -e "Instalando Archivos Maestros y Tablas \n"
 bash $GRUPO/Glog.sh "InsPro.sh" "Instalando Archivos Maestros y Tablas"
 
 #Nombre de la carpeta que contiene los datos
-dataDir="$GRUPO/2015-1C-Datos/"
+dataDir="2015-1C-Datos/"
 
 ###### 20.2 mueven los archivos maestros #######
 lsMaeResult=`ls $dataDir | grep '\.mae$'`
