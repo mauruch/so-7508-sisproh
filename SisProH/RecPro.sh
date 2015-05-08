@@ -4,12 +4,11 @@
 
 
 ### Variables ###
-## NOTA: HAY QUE AJUSTAR LAS CARPETAS
-
 
 carpetaNovedades=$NOVEDIR
 carpetaAceptados=$ACEPDIR
 carpetaRechazados=$RECHDIR
+carpetaMaestros=$MAEDIR
 
 
 DORMIR_RECPRO=60
@@ -60,16 +59,16 @@ function valExtensionArch(){
 
 
 #Función a la que se le envía un string y valida que sea una fecha
-#Retorna la fecha en formato YYYYMMDD, 0 en caso contrario
+#Retorna 1 en caso de éxito, 0 en caso contrario
 function valFecha(){
-diasMeses=(31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31)
+diasMeses=(31 29 31 30 31 30 31 31 30 31 30 31)
 
-	if [ $1 == "NULL" ]
-	then
-		fecha=$(date +'%Y%m%d')
-		return $fecha
+	#if [ $1 == "NULL" ]
+	#then
+	#	fecha=$(date +'%Y%m%d')
+	#	return $fecha
 		
-	else
+	#else
 		nombreValido=`echo $1 | grep '^[0-3][0-9][/,-][0-1][0-9][/,-][0-9][0-9][0-9][0-9]$' | wc -l`
 		
 		if [ $nombreValido -eq 1 ]
@@ -80,21 +79,21 @@ diasMeses=(31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31)
 			then
 				let mes=$mes-1
 				var=${diasMeses[$mes]}
-				if [ $dia -gt $var ]
+				if [ $dia-gt$var ]
 				then	
 					return 1
 					
 				fi
 			else
-				return 1
+				return 0
 			fi
 		else
-			return 1
+			return 0
 
 		fi
 	
-		return 1
-	fi
+		return 0
+	#fi
 
 
 }
@@ -130,11 +129,79 @@ function valFormatoNombreArch(){
 			# "<cod_emisor>"
 			archivo='emisores.mae'
 	     		;;
+			5)
+			# "<fecha>"
+			# La fecha se valida según el rango de la gestión, 
+			# en el caso de ser la gestión actual, se toma la fecha de hoy
+
+			validar=${validar//-//}
+			valFecha $validar
+
+			if [ $? -eq 1 ]
+			then
+				#validar=$(date -d "$validar" +'%Y%d%m')
+				dia=${validar:0:2}
+				mes=${validar:3:2}
+				anyo=${validar:6:4}
+				validar=$anyo$mes$dia
+
+			
+				desde=`grep $codGestion';' $carpetaMaestros/gestiones.mae | cut -d';' -f2 --output-delimiter=$'\n'`
+				hasta=`grep $codGestion';' $carpetaMaestros/gestiones.mae | cut -d';' -f3 --output-delimiter=$'\n'`
+			
+				echo $desde
+				valFecha $desde
+				if [ $? -eq 1 ]
+				then
+					#desde=$(date -d "$desde" +'%Y%d%m'); 
+					dia=${desde:0:2}
+					mes=${desde:3:2}
+					anyo=${desde:6:4}
+					desde=$anyo$mes$dia
+
+					echo $hasta
+					if [ -z $hasta ] || [ $hasta == 'NULL' ]
+					then
+						hasta=$(date +'%d/%m/%Y'); 
+						echo "hoy es" $hasta
+
+					fi
+					
+					valFecha $hasta
+					if [ $? -eq 1 ]
+					then	
+						#hasta=$(date -d "$hasta" +'%Y%d%m'); 
+						dia=${hasta:0:2}
+						mes=${hasta:3:2}
+						anyo=${hasta:6:4}
+						hasta=$anyo$mes$dia
+						echo "Debe aparecer año mes día " $hasta
+						
+						if [ $validar -gt $hasta ] || [ $validar -lt $desde ]
+						then
+							nombreValido=0
+						fi
+
+					else 
+						nombreValido=0
+						let cont=$cont+1
+					fi
+
+				else
+					nombreValido=0
+					let cont=$cont+1
+
+				fi
+			else
+				nombreValido=0
+				let cont=$cont+1
+			fi
+		 	;;
 	  		esac
 
 			if [ $cont -eq 1 ] || [ $cont -eq 2 ] || [ $cont -eq 3 ]
 			then
-				nombreValido=`cut -d';' -f1 $MAEDIR/$archivo | grep $validar$ | wc -l`
+				nombreValido=`cut -d';' -f1 $carpetaMaestros/$archivo | grep $validar$ | wc -l`
 				
 			fi
 
@@ -226,7 +293,7 @@ function detectarArribos(){
 			pid=`pgrep feprima.sh`
 			$GRUPO/Glog.sh  $nombreScript "ProPro ya corriendo bajo el no.: $pid"
 		else
-			$BINDIR/ProPro.sh 
+			$BINDIR/ProPro.sh &
 			$GRUPO/Glog.sh  $nombreScript "ProPro corriendo bajo el no.: $!"
 		fi
 
