@@ -1,6 +1,8 @@
 #!/bin/bash
 
 #Shell script para detener procesos
+#Uso: Stop.sh nombreFunción
+
 functionToStop="$(ps -a | grep "$1" | awk '{print $1}')"
 
 if [ "$functionToStop" = '' ]
