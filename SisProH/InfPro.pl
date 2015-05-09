@@ -153,7 +153,7 @@ sub mostrarDataConsultas {
 				unless(open FILE, '>'."$filePath") {
 					die "Unable to create $filePath";
 				}
-			}
+		}
 	
 			if ($#ARGV >= 1) {
 				my $knowIfData = 0;
@@ -177,7 +177,7 @@ sub mostrarDataConsultas {
 		   				print "$keyArrayed[5]\n";   						
 		   				if ($ARGV[0] eq '-cg') {
 		   					#Y aca debería escribir en un archivo
-						print FILE "$codigoNorma $emisor{$codigoEmisor} $codigoEmisor $keyArrayed[2] $keyArrayed[3] $codigoGestion $keyArrayed[1] $keyArrayed[4] $keyArrayed[5] $keyArrayed[10]\n";   				}#Fin del guardado
+						print FILE "$codigoNorma $emisor{$codigoEmisor} $codigoEmisor $keyArrayed[2] $keyArrayed[3] $codigoGestion $keyArrayed[1] $keyArrayed[4] $keyArrayed[5] $keyArrayed[10]";   				}#Fin del guardado
 					}
 				}
 				print "   No se han encontrado resultados\n";
@@ -201,7 +201,7 @@ sub mostrarDataConsultas {
 					print "$keyArrayed[5]\n";
 					if ($ARGV[0] eq '-cg') {
 						#Y aca debería escribir en un archivo
-						print FILE "$codigoNorma $emisor{$codigoEmisor} $codigoEmisor $keyArrayed[2] $keyArrayed[3] $codigoGestion $keyArrayed[1] $keyArrayed[4] $keyArrayed[5] $keyArrayed[10]\n";
+						print FILE "$codigoNorma $emisor{$codigoEmisor} $codigoEmisor $keyArrayed[2] $keyArrayed[3] $codigoGestion $keyArrayed[1] $keyArrayed[4] $keyArrayed[5] $keyArrayed[10]";
 					}
 				}
 			}
@@ -402,7 +402,7 @@ sub setOptionValuesConsulta {
 		@opcionDos = ($desde, $hasta);
 	}
 	else{
-			@opcionDos = (1810, 2100);	#Del año 1810 al 2100
+			@opcionDos = (-1, 2100);	#Del año -1 al 2100
 	}
 
 	if ($flagTres){
@@ -453,7 +453,7 @@ sub getflagsConsulta {
 	$flagCuatro = 0;
 	$flagCinco = 0;
 	while ($eligioOpcion != 1){
-		print color("red"),"\n\t\tMenu de consulta\n\n",color("reset");
+		print color("red"),"\n\t\tMenu de filtros\n\n",color("reset");
 		print "Seleccione un filtro que desee aplicar, debe seleccionar almenos uno\n";
 		print "Filtrar por:\n";
 		print "1_Tipo de norma (todas, una)\n";
@@ -520,8 +520,126 @@ sub menuPreguntaSiSeguirConsultando {
 	exit;
 }
 
+######################################################################################################################################
+######################################################################################################################################
+######################################################################################################################################
+######################################################################################################################################
+######################################################################################################################################
+
 sub menuInforme {
 	print color("red"),"\n\t\tMenu de informe\n\n", color("reset");
+	my $keyWord = &palabraClaveABuscar;
+	&mostrarDataInformes( &setOptionValuesConsulta(&getflagsConsulta) );
+}
+
+sub mostrarDataInformes {
+	my ($opcionUno,$opcionDosDesde,$opcionDosHasta,$opcionTresDesde,$opcionTresHasta,$opcionCuatro,$opcionCinco) = @_;
+	my (@filesToProcess, @dataToFilter);
+	`reset`;
+	@filesToProcess = `ls $INFODIR`;
+	@dataToFilter = &filterInformeTipoNorma($opcionUno,@filesToProcess);
+	if ($opcionDosDesde != -1){
+		@dataToFilter = &filterInformeYear($opcionDosDesde,$opcionDosHasta,@dataToFilter);
+	}	#Lo aplico sólo si no lo dejé vacío
+	if ($opcionTresDesde != -1){
+		@dataToFilter = &filterInformeNumeroNorma($opcionTresDesde,$opcionTresHasta,@dataToFilter);
+	}	#Lo aplico sólo si no lo dejé vacío
+	if ($opcionCuatro ne ""){
+		@dataToFilter = &filterInformeGestion($opcionCuatro,@dataToFilter);
+	}	#Lo aplico sólo si no lo dejé vacío
+	if ($opcionCinco ne ""){
+		@dataToFilter = &filterInformeEmisor($opcionCinco,@dataToFilter);
+	}
+
+	foreach (@dataToFilter){
+		print "JE $_ WASD\n";
+	}
+}
+
+sub filterInformeGestion {
+	my ($gestion,@dataToFilter) = @_;
+
+	foreach $line (@dataToFilter){
+		$gestionSacada = `echo "$line" | cut -d ' ' -f 6`;
+		chomp($gestionSacada);
+		chomp($line);
+		if ( "$gestionSacada" eq "$gestion" ){				
+			push (@retval, $line);
+		}
+	}
+	return (@retval);
+}
+
+sub filterInformeNumeroNorma {
+	my ($normaDesde,$normaHasta,@dataToFilter) = @_;
+
+	foreach $line (@dataToFilter){
+		$normita = `echo "$line" | cut -d ' ' -f 4`;
+		chomp($normita);
+		if (($normita >= $normaDesde) and ($normita <=$normaHasta)){
+			chomp($line);
+			push (@retval, $line);
+		}
+	}
+	return (@retval);
+}
+
+sub filterInformeYear {
+	my ($yearDesde,$yearHasta,@dataToFilter) = @_;
+
+	foreach $line (@dataToFilter){
+		$year = `echo "$line" | cut -d ' ' -f 5`;
+		chomp($year);
+		if (($year >= $yearDesde) and ($year <=$yearHasta)){
+			chomp($line);
+			push (@retval, $line);
+		}
+	}
+	return (@retval);
+}
+
+sub filterInformeTipoNorma {
+	my ($tipoNorma,@filesToProcess) = @_;
+	my (@retval, @files,@chompedFiltering);
+
+	foreach (@filesToProcess) {
+		$dirOfFile = "$INFODIR/$_";
+		push (@files,$dirOfFile);
+	}
+	
+	if ($tipoNorma eq ''){
+		foreach (@files){
+			push (@retval,`cat $_`);
+		}
+		return (@retval);
+	}
+	else{
+		foreach (@files){
+			push (@currentlyFiltering,`cat $_`);			
+		}
+		foreach (@currentlyFiltering){
+			#le saco los espacios
+			chomp($_);		
+			push (@chompedFiltering,$_);
+		}
+		foreach $filteredLine (@chompedFiltering){
+			$tipoNormaSacado = `echo "$filteredLine" | cut -d ' ' -f 1`;
+			chomp($tipoNormaSacado);
+			if ( "$tipoNormaSacado" eq "$tipoNorma" ){				
+				push (@retval, $filteredLine);
+			}
+		}
+		return (@retval);
+	}
+}
+
+sub palabraClaveABuscar {
+	my $retval;
+	print "   Elija palabra Clave a buscar\n";
+	$retval = <STDIN>;
+	$retval = uc $retval;	#uc es upper case
+	chomp($retval);
+	return $retval;
 }
 
 sub menuEstadistica {
