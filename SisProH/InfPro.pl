@@ -1,6 +1,8 @@
+#!/usr/bin/perl
 #!/bin/perl
 
 use 5.010;
+use Term::ANSIColor;
 
 #Comando para la Obtención de Informes y estadísticas
 
@@ -25,10 +27,21 @@ $checkProcdir = "$PROCDIR";
 @arrayDeCheckeos = ($checkEmisores,$checkNormas,$checkGestiones,$checkInfodir,$checkProcdir);
 my $count_args = $#ARGV + 1;	#sirve o se borra?
 
-&checkeos;
-&decideWhatToDo;
-#Si llego acá es porque no ingresó ningun comando
-&menuSuperAyuda;
+##############
+#### MAIN ####
+##############
+&main;
+###############
+# FIN DE MAIN #
+###############
+
+sub main {
+	`reset`;
+	&checkeos;
+	&decideWhatToDo;
+	#Si llego acá es porque no ingresó ningun comando
+	&menuSuperAyuda;
+}
 
 sub decideWhatToDo {
 	if ($ARGV[0] eq '-a'){
@@ -53,6 +66,13 @@ sub decideWhatToDo {
 }
 
 sub checkeos {
+	#Acá checkeo si el ambiente fue inicializado
+	if ($MAEDIR eq ''){
+		print "No se ha inicializado el ambiente\n";
+		print "Ejecute en la terminal \". IniPro.sh\"\n";
+		exit;
+	}
+
 	foreach $check (@arrayDeCheckeos){
 		if (! -e "$check"){
 			print "No se encuentra $check\n";
@@ -62,7 +82,7 @@ sub checkeos {
 }
 
 sub menuAyuda {
-	print "\n\t\tMenu de ayuda\n\n";
+	print color("red"),"\n\t\tMenu de ayuda\n\n",color("reset");
 	print "-e muestra estadísticas de documentos ya protocolizados\n";
 	print "-c le permitirá consultar sobre documentos protocolizados\n";
 	print "-i se muestran informes de los archivos de consultas previas\n";
@@ -79,6 +99,7 @@ sub mostrarDataConsultas {
 	my (@gestionDirectory, @gestionDirectoryAProcesar);
 	my ($currentDirToProcess);
 	my(@filesToProcess, @filteredData,@sortedData,%filteredDataHash);
+	`reset`;
 	####Ahora que tengo todo debería mostrarle la data
 	@filesToProcess = &applyFilterGestion($opcionCuatro);											#Opción Cuatro
 	@filesToProcess = &applyFilterEmisor($opcionCinco, @filesToProcess);							#Opción Cinco
@@ -86,79 +107,83 @@ sub mostrarDataConsultas {
 	@filesToProcess = &applyFilterCodigoNorma($opcionUno, @filesToProcess);							#Opción Uno
 	@filteredData = &applyFilterNumeroNorma($opcionTresDesde,$opcionTresHasta,@filesToProcess);		#Opción Tres
 
-	if ($ARGV[0] eq '-cg') {
-	#Y aca debería escribir en un archivo
-		my $salir = 0;
-		my $contador = 1;
-		my $filePath;
-		while ( $salir == 0) {	
-			$filePath = "$INFODIR/resultados_$contador";
-			if ( -e $filePath ){
-				$contador +=1;
+	if ($#filteredData != -1){
+		if ($ARGV[0] eq '-cg') {
+			#Y aca debería escribir en un archivo
+				my $salir = 0;
+				my $contador = 1;
+				my $filePath;
+				while ( $salir == 0) {	
+					$filePath = "$INFODIR/resultados_$contador";
+					if ( -e $filePath ){
+						$contador +=1;
+					}
+					else {
+						$salir = 1;
+					}
+				}
+				unless(open FILE, '>'."$filePath") {
+					die "Unable to create $filePath";
+				}
 			}
-			else {
-				$salir = 1;
+	
+			if ($#ARGV >= 1) {
+				my $knowIfData = 0;
+				#significa que quiere filtrar por algo más
+				%filteredDataHash = &applyFilterKeyword(@filteredData);
+				#Y esto que sigue no lo puedo meter en una funcion porque le tendría que pasar un hash y un array
+				foreach my $theKey (sort { $filteredDataHash{$b} <=> $filteredDataHash{$a} } keys %filteredDataHash) {
+		   			if ($filteredDataHash{$theKey} > 0) {
+		   				$nowIfData = 1;
+		   				my @keyArrayed = split (";", $theKey);
+						$codigoGestion = `echo $keyArrayed[0] | cut -d '_' -f 1`;
+						chomp ($codigoGestion);
+						$codigoNorma = `echo $keyArrayed[0] | cut -d '_' -f 2`;
+						chomp ($codigoNorma);
+						$codigoEmisor = `echo $keyArrayed[0] | cut -d '_' -f 3`;
+						chomp ($codigoEmisor);
+		   				#TODO tengo el codigo de emisor pero no el emisor, de ultima leo el archivo y me armo el hash
+		   				print "############################################################################################\n";  		
+		   				print "$codigoNorma $emisor($codigoEmisor) $keyArrayed[2]/$keyArrayed[3] $codigoGestion $keyArrayed[1] Peso=$filteredDataHash{$theKey}\n";
+		   				print "$keyArrayed[4]\n";
+		   				print "$keyArrayed[5]\n";   						
+		   				if ($ARGV[0] eq '-cg') {
+		   					#Y aca debería escribir en un archivo
+						print FILE "$codigoNorma $emisor $codigoEmisor $keyArrayed[2] $keyArrayed[3] $codigoGestion $keyArrayed[1] $keyArrayed[4] $keyArrayed[5] $keyArrayed[10]\n";   				}#Fin del guardado
+					}
+				}
+				print "   No se han encontrado resultados\n";
 			}
-		}
-		unless(open FILE, '>'."$filePath") {
-			die "Unable to create $filePath";
-		}
-	}
-
-
-
-	if ($#ARGV >= 1) {
-		#significa que quiere filtrar por algo más
-		%filteredDataHash = &applyFilterKeyword(@filteredData);
-		#Y esto que sigue no lo puedo meter en una funcion porque le tendría que pasar un hash y un array
-		foreach my $theKey (sort { $filteredDataHash{$b} <=> $filteredDataHash{$a} } keys %filteredDataHash) {
-   			if ($filteredDataHash{$theKey} > 0) {
-   				my @keyArrayed = split (";", $theKey);
-				$emisor = "pepe";
-				$codigoGestion = `echo $keyArrayed[0] | cut -d '_' -f 1`;
-				chomp ($codigoGestion);
-				$codigoNorma = `echo $keyArrayed[0] | cut -d '_' -f 2`;
-				chomp ($codigoNorma);
-				$codigoEmisor = `echo $keyArrayed[0] | cut -d '_' -f 3`;
-				chomp ($codigoEmisor);
-   				#TODO tengo el codigo de emisor pero no el emisor, de ultima leo el archivo y me armo el hash
-   				print "############################################################################################\n";  		
-   				print "$codigoNorma $emisor($codigoEmisor) $keyArrayed[2]/$keyArrayed[3] $codigoGestion $keyArrayed[1] Peso=$filteredDataHash{$theKey}\n";
-   				print "$keyArrayed[4]\n";
-   				print "$keyArrayed[5]\n";   						
-   				if ($ARGV[0] eq '-cg') {
-   					#Y aca debería escribir en un archivo
-				print FILE "$codigoNorma $emisor $codigoEmisor $keyArrayed[2] $keyArrayed[3] $codigoGestion $keyArrayed[1] $keyArrayed[4] $keyArrayed[5] $keyArrayed[10]\n";   				}#Fin del guardado
+			else{
+				#ordenar cronológicamente
+				%filteredDataHash = &makeHashWithDates(@filteredData);
+				#http://stackoverflow.com/questions/2491471/how-can-i-sort-dates-in-perl
+				foreach my $theKey (sort { join('', (split '/', $a)[2,1,0]) cmp join('', (split '/', $b)[2,1,0]) } keys %filteredDataHash) {
+					my @keyArrayed = split (";", $theKey);			
+					$codigoGestion = `echo $keyArrayed[0] | cut -d '_' -f 1`;
+					chomp ($codigoGestion);
+					$codigoNorma = `echo $keyArrayed[0] | cut -d '_' -f 2`;
+					chomp ($codigoNorma);
+					$codigoEmisor = `echo $keyArrayed[0] | cut -d '_' -f 3`;
+					chomp ($codigoEmisor);
+					#TODO tengo el codigo de emisor pero no el emisor, de ultima leo el archivo y me armo el hash
+					print "############################################################################################\n";  		
+		   			print "$codigoNorma $emisor($codigoEmisor) $keyArrayed[2]/$keyArrayed[3] $codigoGestion $keyArrayed[1]\n";
+					print "$keyArrayed[4]\n";
+					print "$keyArrayed[5]\n";
+					if ($ARGV[0] eq '-cg') {
+						#Y aca debería escribir en un archivo
+						print FILE "$codigoNorma $emisor $codigoEmisor $keyArrayed[2] $keyArrayed[3] $codigoGestion $keyArrayed[1] $keyArrayed[4] $keyArrayed[5] $keyArrayed[10]\n";
+					}
+				}
 			}
-		}		
-	}
-	else{
-		#ordenar cronológicamente
-		%filteredDataHash = &makeHashWithDates(@filteredData);
-		#http://stackoverflow.com/questions/2491471/how-can-i-sort-dates-in-perl
-		foreach my $theKey (sort { join('', (split '/', $a)[2,1,0]) cmp join('', (split '/', $b)[2,1,0]) } keys %filteredDataHash) {
-			my @keyArrayed = split (";", $theKey);
-			$emisor = "pepe";
-			$codigoGestion = `echo $keyArrayed[0] | cut -d '_' -f 1`;
-			chomp ($codigoGestion);
-			$codigoNorma = `echo $keyArrayed[0] | cut -d '_' -f 2`;
-			chomp ($codigoNorma);
-			$codigoEmisor = `echo $keyArrayed[0] | cut -d '_' -f 3`;
-			chomp ($codigoEmisor);
-			#TODO tengo el codigo de emisor pero no el emisor, de ultima leo el archivo y me armo el hash
-			print "############################################################################################\n";  		
-   			print "$codigoNorma $emisor($codigoEmisor) $keyArrayed[2]/$keyArrayed[3] $codigoGestion $keyArrayed[1]\n";
-			print "$keyArrayed[4]\n";
-			print "$keyArrayed[5]\n";
+	
 			if ($ARGV[0] eq '-cg') {
-				#Y aca debería escribir en un archivo
-				print FILE "$codigoNorma $emisor $codigoEmisor $keyArrayed[2] $keyArrayed[3] $codigoGestion $keyArrayed[1] $keyArrayed[4] $keyArrayed[5] $keyArrayed[10]\n";
+				close FILE;
 			}
-		}
 	}
-
-	if ($ARGV[0] eq '-cg') {
-		close FILE;
+	else {
+		print "   No se han encontrado resultados\n";
 	}
 
 	&menuPreguntaSiSeguirConsultando;
@@ -328,7 +353,7 @@ sub setOptionValuesConsulta {
 	($flagUno, $flagDos, $flagTres, $flagCuatro, $flagCinco) = @_;
 	#Ahora pregunto que valor quiere por cada opción elegida
 	if ($flagUno){
-			print "Elija un tipo de norma\n";
+			print "\nElija un tipo de norma\n";
 			print ">";
 			$opcionUno = <STDIN>;
 			chomp($opcionUno);
@@ -338,11 +363,11 @@ sub setOptionValuesConsulta {
 	}
 
 	if ($flagDos){		
-		print "Año desde:\n";
+		print "\nAño desde:\n";
 		print ">";
 		$desde = <STDIN>;
 		chomp($desde);
-		print "Año hasta:\n";
+		print "\nAño hasta:\n";
 		print ">";
 		$hasta = <STDIN>;
 		chomp($hasta);
@@ -353,11 +378,11 @@ sub setOptionValuesConsulta {
 	}
 
 	if ($flagTres){
-		print "Número de norma desde:\n";
+		print "\nNúmero de norma desde:\n";
 		print ">";
 		$desde = <STDIN>;
 		chomp($desde);
-		print "Número de norma hasta:\n";
+		print "\nNúmero de norma hasta:\n";
 		print ">";
 		$hasta = <STDIN>;
 		chomp($hasta);
@@ -368,7 +393,7 @@ sub setOptionValuesConsulta {
 	}
 
 	if ($flagCuatro){
-		print "Escriba la gestión a buscar:\n";
+		print "\nEscriba la gestión a buscar:\n";
 		print ">";
 		$opcionCuatro = <STDIN>;
 		chomp($opcionCuatro);
@@ -378,7 +403,7 @@ sub setOptionValuesConsulta {
 	}
 
 	if ($flagCinco){
-		print "Escriba emisor a buscar:\n";
+		print "\nEscriba emisor a buscar:\n";
 		print ">";
 		$opcionCinco = <STDIN>;
 		chomp($opcionCinco);
@@ -400,7 +425,7 @@ sub getflagsConsulta {
 	$flagCuatro = 0;
 	$flagCinco = 0;
 	while ($eligioOpcion != 1){
-		print "\n\t\tMenu de consulta\n\n";
+		print color("red"),"\n\t\tMenu de consulta\n\n",color("reset");
 		print "Seleccione un filtro que desee aplicar, debe seleccionar almenos uno\n";
 		print "Filtrar por:\n";
 		print "1_Tipo de norma (todas, una)\n";
@@ -451,12 +476,12 @@ sub getflagsConsulta {
 sub menuPreguntaSiSeguirConsultando {
 	my($opcionElegida);
 
-	print "¿Desea realizar otra consulta?[S/N]\n";
+	print color("red"),"\t¿Desea realizar otra consulta?[S/N]\n",color("reset");
 	$opcionElegida = <STDIN>;
 	$opcionElegida = uc $opcionElegida;
 	chomp($opcionElegida);
 	while($opcionElegida ne 'S' and $opcionElegida ne 'N'){		
-		print "\n¿Desea realizar otra consulta?[S/N]\n";
+		print color("red"),"\t¿Desea realizar otra consulta?[S/N]\n",color("reset");
 		$opcionElegida = <STDIN>;
 		$opcionElegida = uc $opcionElegida;
 		chomp($opcionElegida);
@@ -468,22 +493,22 @@ sub menuPreguntaSiSeguirConsultando {
 }
 
 sub menuInforme {
-	print "\n\t\tMenu de informe\n\n";
+	print color("red"),"\n\t\tMenu de informe\n\n", color("reset");
 }
 
 sub menuEstadistica {
-	print "\n\t\tMenu de estadistica\n\n";
+	print color("red"),"\n\t\tMenu de estadistica\n\n", color("reset");
 }
 
-sub menuSuperAyuda {
-	print "\n\t\tMenu de super ayuda\n\n";
-	print "Para utilizar este comando:\n";
-	print "InfPro.pl opción claveDeBusqueda(opcional)\n";
-	print "opción: -a ayuda, -e estadísticas, -eg estadísticas y guardar resultado\n";
-	print "-i informe, -ig informe y guardar resultados\n";
-	print "-c consulta, -cg consulta y guardar resultados\n\n";
-	print "claveDeBusqueda: Sólo válido para -i -ig -c -cg\n";
-	print "para el caso de -c o -cg se debe indicar palabra clave a buscar\n";
-	print "para el caso de -i o -ig se debe indicar uno o varios nombres de archivos\n\n";
+sub menuSuperAyuda {    
+    print color("red"),"\n\t\tMenu de super ayuda\n\n", color("reset");
+	print "   Para utilizar este comando:\n";
+	print "   InfPro.pl opción claveDeBusqueda(opcional)\n";
+	print "   opción: -a ayuda, -e estadísticas, -eg estadísticas y guardar resultado\n";
+	print "   -i informe, -ig informe y guardar resultados\n";
+	print "   -c consulta, -cg consulta y guardar resultados\n\n";
+	print "   claveDeBusqueda: Sólo válido para -i -ig -c -cg\n";
+	print "   para el caso de -c o -cg se debe indicar palabra clave a buscar\n";
+	print "   para el caso de -i o -ig se debe indicar uno o varios nombres de archivos\n\n";
 	exit;
 }
