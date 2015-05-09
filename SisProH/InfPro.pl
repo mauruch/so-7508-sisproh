@@ -23,6 +23,7 @@ $checkNormas = "$MAEDIR/normas.mae";
 $checkGestiones = "$MAEDIR/gestiones.mae";
 $checkInfodir = "$INFODIR";
 $checkProcdir = "$PROCDIR";
+%emisor;
 #Y lo meto en un array para usar un foreach, porque el foreach es lo mas grande que hay, como manaos
 @arrayDeCheckeos = ($checkEmisores,$checkNormas,$checkGestiones,$checkInfodir,$checkProcdir);
 my $count_args = $#ARGV + 1;	#sirve o se borra?
@@ -38,9 +39,33 @@ my $count_args = $#ARGV + 1;	#sirve o se borra?
 sub main {
 	`reset`;
 	&checkeos;
+	&makeHashWithEmisores;
 	&decideWhatToDo;
 	#Si llego acá es porque no ingresó ningun comando
 	&menuSuperAyuda;
+}
+
+sub makeHashWithEmisores {
+	my @emisoresList;
+	my ($key,$value);
+	if ( open(FILE,"$checkEmisores") ) {
+		while (my $row = <FILE>) {
+		  chomp $row;
+		  push (@emisoresList,$row);
+		}		
+		close(FILE);
+	}
+	else{
+		print "No se pudo abrir $checkEmisores";
+		exit;
+	}
+	foreach $line (@emisoresList) {
+		$key = `echo "$line" | cut -d ';' -f 1`;
+		chomp($key);
+		$value = `echo "$line" | cut -d ';' -f 2`;
+		chomp($value);
+		$emisor{$key} = $value;	
+	}
 }
 
 sub decideWhatToDo {
@@ -77,6 +102,9 @@ sub checkeos {
 		if (! -e "$check"){
 			print "No se encuentra $check\n";
 			exit;
+		}
+		else{
+			`chmod +rw $check`;
 		}
 	}
 }
@@ -149,7 +177,7 @@ sub mostrarDataConsultas {
 		   				print "$keyArrayed[5]\n";   						
 		   				if ($ARGV[0] eq '-cg') {
 		   					#Y aca debería escribir en un archivo
-						print FILE "$codigoNorma $emisor $codigoEmisor $keyArrayed[2] $keyArrayed[3] $codigoGestion $keyArrayed[1] $keyArrayed[4] $keyArrayed[5] $keyArrayed[10]\n";   				}#Fin del guardado
+						print FILE "$codigoNorma $emisor{$codigoEmisor} $codigoEmisor $keyArrayed[2] $keyArrayed[3] $codigoGestion $keyArrayed[1] $keyArrayed[4] $keyArrayed[5] $keyArrayed[10]\n";   				}#Fin del guardado
 					}
 				}
 				print "   No se han encontrado resultados\n";
@@ -168,12 +196,12 @@ sub mostrarDataConsultas {
 					chomp ($codigoEmisor);
 					#TODO tengo el codigo de emisor pero no el emisor, de ultima leo el archivo y me armo el hash
 					print "############################################################################################\n";  		
-		   			print "$codigoNorma $emisor($codigoEmisor) $keyArrayed[2]/$keyArrayed[3] $codigoGestion $keyArrayed[1]\n";
+		   			print "$codigoNorma $emisor{$codigoEmisor}($codigoEmisor) $keyArrayed[2]/$keyArrayed[3] $codigoGestion $keyArrayed[1]\n";
 					print "$keyArrayed[4]\n";
 					print "$keyArrayed[5]\n";
 					if ($ARGV[0] eq '-cg') {
 						#Y aca debería escribir en un archivo
-						print FILE "$codigoNorma $emisor $codigoEmisor $keyArrayed[2] $keyArrayed[3] $codigoGestion $keyArrayed[1] $keyArrayed[4] $keyArrayed[5] $keyArrayed[10]\n";
+						print FILE "$codigoNorma $emisor{$codigoEmisor} $codigoEmisor $keyArrayed[2] $keyArrayed[3] $codigoGestion $keyArrayed[1] $keyArrayed[4] $keyArrayed[5] $keyArrayed[10]\n";
 					}
 				}
 			}
@@ -322,7 +350,7 @@ sub applyFilterEmisor {
 }
 
 sub applyFilterGestion {
-	$gestionAFiltrar = $_;
+	my $gestionAFiltrar = $_;
 	my (@retval);
 	#TODO cambiar el hardcodeo
 	my (@gestionDirectory) = `ls $PROCDIR`;
