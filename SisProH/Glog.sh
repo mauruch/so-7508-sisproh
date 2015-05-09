@@ -38,7 +38,7 @@ ERROR_PARAMETROS=-2
 #Cantidad de lineas a respaldar en cada truncamiento
 cantidadLineasRespaldo=15
 
-if [ $1 == "InsPro.sh" ]; then
+if [ "$1" = "InsPro.sh" ]; then
 	LOGSIZE=450000
 fi
 

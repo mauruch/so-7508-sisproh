@@ -1,57 +1,32 @@
-#!/bin/bash
-
-#Shell script para disparar procesos
-
-# Descripcion: Comando que inicia la ejecucion del demonio 'RecPro'.
-#. ../conf/InsPro.conf
-
-
-### Variables ###
-## NOTA: HAY QUE AJUSTAR LAS CARPETAS
-###$BIN_DIR es la carpeta de archivos principal donde esta RecPro por ejemplo
-
 nombreScript=`basename "$0"`
-#BIN_DIR='/home/paulo/Escritorio/SisProH'
-TRUE=0
-FALSE=0
-#direccion del archivo Glog.sh
-#Glog=$BINDIR/Glog.sh
 
-Glog=$BIN_DIR/Glog.sh
-
-	sePuedeEjecutar()
-	{
-
-		if ! [ -f $Glog ]; then   #Si el archivo Glog no existe....
-		echo "No se puede ejecutar: primero se debe ejecutar IniPro.sh"
-		echo ""
+function sePuedeEjecutar(){
+		if [ "$BINDIR" = '' ]; then   #Si no tengo BINDIR como una variable puesta por el inipro
+		echo "Ambiente no inicializado, por favor corra ". IniPro.sh" en la terminal"		
 		exit 1
 		fi
-
-
 	}
 
-# Funcion que devuelve TRUE si RecPro esta corriendo, FALSE en caso contrario
-
-esta_corriendo() {
+function esta_corriendo(){
 
 		x=`ps -e | grep '^.* RecPro\.sh$'`
 		if [ $? -eq 0 ]; then
-			echo "Error: RecPro ya se est· ejecutando."
 			pid=`ps -e | grep '^.* RecPro\.sh$' | sed 's/ \?\([0-9]*\).*/\1/'`
-			./Glog.sh $nombreScript "El demonio ya se encuentra ejecutandose con PID: ${pid}"
-			return $TRUE
+			echo "Error: RecPro ya se est√° ejecutando con PID: ${pid}"
+			$GRUPO/Glog.sh "$nombreScript" "El demonio ya se encuentra ejecutandose con PID: ${pid}"
+			exit 0
 		else
-#$BIN_DIR/
-			$BIN_DIR/RecPro.sh &
+			$BINDIR/RecPro.sh &	#Ejecuto RecPro.sh
 
 			x=`ps -e | grep '^.* RecPro\.sh$'`
 			if [ $? -eq 0 ]; then
 				pid=`ps -e | grep '^.* RecPro\.sh$' | sed 's/ \?\([0-9]*\).*/\1/'`
-				./Glog.sh $nombreScript "Iniciando el demonio RecPro con el Process ID: ${pid}"
-				return $FALSE
-                        fi
-                fi
-		}
+				echo "RecPro.sh inicializado con PID: ${pid}"				
+				$GRUPO/Glog.sh "$nombreScript" "Iniciando el demonio RecPro con el Process ID: ${pid}"
+				exit 0
+			fi
+		fi
+}
+
 sePuedeEjecutar
 esta_corriendo
