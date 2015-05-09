@@ -162,7 +162,7 @@ sub mostrarDataConsultas {
 				#Y esto que sigue no lo puedo meter en una funcion porque le tendría que pasar un hash y un array
 				foreach my $theKey (sort { $filteredDataHash{$b} <=> $filteredDataHash{$a} } keys %filteredDataHash) {
 		   			if ($filteredDataHash{$theKey} > 0) {
-		   				$nowIfData = 1;
+		   				$knowIfData = 1;
 		   				my @keyArrayed = split (";", $theKey);
 						$codigoGestion = `echo $keyArrayed[0] | cut -d '_' -f 1`;
 						chomp ($codigoGestion);
@@ -177,10 +177,12 @@ sub mostrarDataConsultas {
 		   				print "$keyArrayed[5]\n";   						
 		   				if ($ARGV[0] eq '-cg') {
 		   					#Y aca debería escribir en un archivo
-						print FILE "$codigoNorma $emisor{$codigoEmisor} $codigoEmisor $keyArrayed[2] $keyArrayed[3] $codigoGestion $keyArrayed[1] $keyArrayed[4] $keyArrayed[5] $keyArrayed[10]";   				}#Fin del guardado
+						print FILE "$codigoNorma;$emisor{$codigoEmisor};$codigoEmisor;$keyArrayed[2];$keyArrayed[3];$codigoGestion;$keyArrayed[1];$keyArrayed[4];$keyArrayed[5];$keyArrayed[10]";   				}#Fin del guardado
 					}
 				}
-				print "   No se han encontrado resultados\n";
+				if ($knowIfData == 0){
+					print "No se han encontrado resultados\n";
+				}
 			}
 			else{
 				#ordenar cronológicamente
@@ -201,7 +203,7 @@ sub mostrarDataConsultas {
 					print "$keyArrayed[5]\n";
 					if ($ARGV[0] eq '-cg') {
 						#Y aca debería escribir en un archivo
-						print FILE "$codigoNorma $emisor{$codigoEmisor} $codigoEmisor $keyArrayed[2] $keyArrayed[3] $codigoGestion $keyArrayed[1] $keyArrayed[4] $keyArrayed[5] $keyArrayed[10]";
+						print FILE "$codigoNorma;$emisor{$codigoEmisor};$codigoEmisor;$keyArrayed[2];$keyArrayed[3];$codigoGestion;$keyArrayed[1];$keyArrayed[4];$keyArrayed[5];$keyArrayed[10]"; 
 					}
 				}
 			}
@@ -529,14 +531,46 @@ sub menuPreguntaSiSeguirConsultando {
 sub menuInforme {
 	print color("red"),"\n\t\tMenu de informe\n\n", color("reset");
 	my $keyWord = &palabraClaveABuscar;
-	&mostrarDataInformes( &setOptionValuesConsulta(&getflagsConsulta) );
+	&mostrarDataInformes($keyword, ( &setOptionValuesConsulta(&getflagsConsulta) ) );
 }
 
 sub mostrarDataInformes {
-	my ($opcionUno,$opcionDosDesde,$opcionDosHasta,$opcionTresDesde,$opcionTresHasta,$opcionCuatro,$opcionCinco) = @_;
+	my ($keyWord,$opcionUno,$opcionDosDesde,$opcionDosHasta,$opcionTresDesde,$opcionTresHasta,$opcionCuatro,$opcionCinco) = @_;
 	my (@filesToProcess, @dataToFilter);
 	`reset`;
-	@filesToProcess = `ls $INFODIR`;
+
+	if ($ARGV[0] eq '-ig') {
+		#Y aca debería escribir en un archivo
+		my $salir = 0;
+		my $contador = 1;
+		my $filePath;
+		while ( $salir == 0) {	
+			$filePath = "$INFODIR/resultados_$contador";
+			if ( -e $filePath ){
+				$contador +=1;
+			}
+			else {
+				$salir = 1;
+			}
+		}
+		unless(open FILE, '>'."$filePath") {
+			die "Unable to create $filePath";
+		}
+	}
+
+	if($#ARGV == 0){
+		@filesToProcess = `ls $INFODIR`;
+	}
+	else{
+		my $cont = 0;
+		foreach (@ARGV){
+			if ($cont > 0){
+				push(@filesToProcess,$ARGV[$cont]);
+			}
+			$cont += 1;
+		}
+	}
+
 	@dataToFilter = &filterInformeTipoNorma($opcionUno,@filesToProcess);
 	if ($opcionDosDesde != -1){
 		@dataToFilter = &filterInformeYear($opcionDosDesde,$opcionDosHasta,@dataToFilter);
@@ -549,18 +583,117 @@ sub mostrarDataInformes {
 	}	#Lo aplico sólo si no lo dejé vacío
 	if ($opcionCinco ne ""){
 		@dataToFilter = &filterInformeEmisor($opcionCinco,@dataToFilter);
+	}	#Lo aplico sólo si no lo dejé vacío
+	if ($keyWord ne ""){
+		my %hashValues = &filterInformeKeyWord($keyWord,@dataToFilter);
+		my $knowIfData = 0;
+		foreach my $theKey (sort { $filteredDataHash{$b} <=> $filteredDataHash{$a} } keys %filteredDataHash) {
+			if ($filteredDataHash{$theKey} > 0) {
+				$knowIfData = 1;
+				my @keyArrayed = split (";", $theKey);
+				$codigoGestion = `echo $keyArrayed[0] | cut -d '_' -f 1`;
+				chomp ($codigoGestion);
+				$codigoNorma = `echo $keyArrayed[0] | cut -d '_' -f 2`;
+				chomp ($codigoNorma);
+				$codigoEmisor = `echo $keyArrayed[0] | cut -d '_' -f 3`;
+				chomp ($codigoEmisor);
+				#TODO tengo el codigo de emisor pero no el emisor, de ultima leo el archivo y me armo el hash
+				print "############################################################################################\n";  		
+				print "$theKey";   						
+				if ($ARGV[0] eq '-ig') {
+					#Y aca debería escribir en un archivo
+					print FILE "$theKey";   				
+				}#Fin del guardado
+			}
+		}
+		if ($knowIfData == 0){
+			print "No se han encontrado resultados\n";
+		}
+	}
+	else {
+		if ($#dataToFilter != -1){
+			my (%filteredDataHash,$date);
+
+			foreach $lineOfData (@dataToFilter) {
+				$date = `echo "$lineOfData" | cut -d ';' -f 7`;	#veo que esta en la segunda, ya que en la primera está la fuente
+				chomp ($date);
+				$filteredDataHash{$lineOfData} = $date;
+			}
+			#http://stackoverflow.com/questions/2491471/how-can-i-sort-dates-in-perl
+			foreach my $theKey (sort { join('', (split '/', $a)[2,1,0]) cmp join('', (split '/', $b)[2,1,0]) } keys %filteredDataHash) {
+				print "############################################################################################\n";  		
+				print "$theKey";
+				if ($ARGV[0] eq '-ig') {
+					#Y aca debería escribir en un archivo
+					print FILE "$theKey";
+				}
+			}
+		}
+		else{
+			print "No se han encontrado resultados\n";
+		}
+
 	}
 
-	foreach (@dataToFilter){
-		print "JE $_ WASD\n";
+	&menuPreguntaSiSeguirViendoInformes
+
+}
+
+sub menuPreguntaSiSeguirViendoInformes {
+	my($opcionElegida);
+
+	print color("red"),"\t¿Desea realizar otro informe?[S/N]\n",color("reset");
+	$opcionElegida = <STDIN>;
+	$opcionElegida = uc $opcionElegida;
+	chomp($opcionElegida);
+	while($opcionElegida ne 'S' and $opcionElegida ne 'N'){		
+		print color("red"),"\t¿Desea realizar otra consulta?[S/N]\n",color("reset");
+		$opcionElegida = <STDIN>;
+		$opcionElegida = uc $opcionElegida;
+		chomp($opcionElegida);
 	}
+	if ($opcionElegida eq 'S'){
+		&menuInforme;
+	}
+	exit;
+}
+
+sub filterInformeKeyWord {
+	my ($keyWord,@dataToFilter) = @_;
+	
+	my (%retvalhash,$causante,$extracto,@wordsCausante,@wordsExtracto);
+
+	foreach $lineOfData (@dataToFilter) {
+		my $totalPowerOfTheLineOfData = 0;
+		$causante = `echo "$lineOfData" | cut -d ';' -f 8`;
+		$extracto = `echo "$lineOfData" | cut -d ';' -f 9`;
+
+		@wordsCausante = split(" ",$causante);
+		@wordsExtracto = split(" ",$extracto);
+
+		foreach $word (@wordsCausante) {
+			#por cada vez que encuentre la palabra en el causante le sumo 10
+			if ($keyWord eq $word) {
+				$totalPowerOfTheLineOfData += 10;
+			}
+		}
+		foreach $word (@wordsExtracto) {
+			#Lo mismo que el anterior pero ahora con el extracto, aca le sumo 1
+			if ($keyWord eq $word) {
+				$totalPowerOfTheLineOfData += 1;
+			}
+		}
+		$retvalhash{$lineOfData} = $totalPowerOfTheLineOfData;
+	}
+	return (%retvalhash);
+
 }
 
 sub filterInformeGestion {
 	my ($gestion,@dataToFilter) = @_;
 
 	foreach $line (@dataToFilter){
-		$gestionSacada = `echo "$line" | cut -d ' ' -f 6`;
+		$gestionSacada = `echo "$line" | cut -d ';' -f 6`;
 		chomp($gestionSacada);
 		chomp($line);
 		if ( "$gestionSacada" eq "$gestion" ){				
@@ -574,7 +707,7 @@ sub filterInformeNumeroNorma {
 	my ($normaDesde,$normaHasta,@dataToFilter) = @_;
 
 	foreach $line (@dataToFilter){
-		$normita = `echo "$line" | cut -d ' ' -f 4`;
+		$normita = `echo "$line" | cut -d ';' -f 4`;
 		chomp($normita);
 		if (($normita >= $normaDesde) and ($normita <=$normaHasta)){
 			chomp($line);
@@ -588,7 +721,7 @@ sub filterInformeYear {
 	my ($yearDesde,$yearHasta,@dataToFilter) = @_;
 
 	foreach $line (@dataToFilter){
-		$year = `echo "$line" | cut -d ' ' -f 5`;
+		$year = `echo "$line" | cut -d ';' -f 5`;
 		chomp($year);
 		if (($year >= $yearDesde) and ($year <=$yearHasta)){
 			chomp($line);
@@ -608,14 +741,18 @@ sub filterInformeTipoNorma {
 	}
 	
 	if ($tipoNorma eq ''){
-		foreach (@files){
-			push (@retval,`cat $_`);
+		foreach $filedir (@files){
+			if(-e $filedir ){
+				push (@retval,`cat $filedir`);
+			}
 		}
 		return (@retval);
 	}
 	else{
 		foreach (@files){
-			push (@currentlyFiltering,`cat $_`);			
+			if(-e $filedir ){
+				push (@currentlyFiltering,`cat $_`);
+			}		
 		}
 		foreach (@currentlyFiltering){
 			#le saco los espacios
@@ -623,7 +760,7 @@ sub filterInformeTipoNorma {
 			push (@chompedFiltering,$_);
 		}
 		foreach $filteredLine (@chompedFiltering){
-			$tipoNormaSacado = `echo "$filteredLine" | cut -d ' ' -f 1`;
+			$tipoNormaSacado = `echo "$filteredLine" | cut -d ';' -f 1`;
 			chomp($tipoNormaSacado);
 			if ( "$tipoNormaSacado" eq "$tipoNorma" ){				
 				push (@retval, $filteredLine);
