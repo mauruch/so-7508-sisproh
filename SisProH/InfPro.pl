@@ -321,6 +321,8 @@ sub applyFilterCodigoNorma {
 sub applyFilterYear {
 	my ($yearsWantedFrom,$yearsWantedTo, @filesToProcess) = @_;
 	my (@retval, @filesWithTheYears, @partialFiles,$year);
+	chomp ($yearsWantedFrom);
+	chomp ($yearsWantedTo);
 
 	foreach $firstPartDir (@filesToProcess){
 		my (@completeDir);	#como para que se resetee
@@ -337,8 +339,8 @@ sub applyFilterYear {
 		$year = `basename $totalPath`;	#el cut es para files		
 		chomp($year);
 		$year = `echo $year | cut -d '.' -f 1`;
-		chomp($year);		
-		if (($year >= $yearsWantedFrom) and ($year <=$yearsWantedTo)){
+		chomp($year);
+		if (($year >= $yearsWantedFrom) and ($year <= $yearsWantedTo)){
 			push (@retval, $totalPath);
 		}		
 	}
@@ -358,7 +360,7 @@ sub applyFilterEmisor {
 }
 
 sub applyFilterGestion {
-	my $gestionAFiltrar = $_;
+	my ($gestionAFiltrar) = @_;
 	my (@retval);
 	#TODO cambiar el hardcodeo
 	my (@gestionDirectory) = `ls $PROCDIR`;
@@ -538,6 +540,7 @@ sub menuInforme {
 	print color("red"),"\n\t\tMenu de informe\n\n", color("reset");
 	my $keyWord = &palabraClaveABuscar;
 	&mostrarDataInformes($keyword, ( &setOptionValuesConsulta(&getflagsConsulta) ) );
+	&menuPreguntaSiSeguirViendoInformes;
 }
 
 sub mostrarDataInformes {
@@ -641,9 +644,6 @@ sub mostrarDataInformes {
 		}
 
 	}
-
-	&menuPreguntaSiSeguirViendoInformes
-
 }
 
 sub menuPreguntaSiSeguirViendoInformes {
@@ -798,13 +798,14 @@ sub menuEstadistica {
 }
 
 sub mostrarDataEstadistica {
+	`reset`;
 	my ($yearDesde,$yearHasta,$gestion) = @_;
 	my (@filesToProcess);
-	`reset`;
 
 	@filesToProcess = &applyFilterGestion($gestion);
-	@filesToProcess = &applyFilterYear($opcionDosDesde,$opcionDosHasta,@filesToProcess);
+	@filesToProcess = &applyFilterYear($yearDesde,$yearHasta,@filesToProcess);
 	&mostrarLasEstadisticas(@filesToProcess);
+	&menuPreguntaSiSeguirViendoEstadisticas;
 }
 
 sub mostrarLasEstadisticas {
@@ -817,7 +818,7 @@ sub mostrarLasEstadisticas {
 		my $contador = 1;
 		my $filePath;
 		while ( $salir == 0) {	
-			$filePath = "$INFODIR/resultados_$contador";
+			$filePath = "$INFODIR/estadisticas_$contador";
 			if ( -e $filePath ){
 				$contador +=1;
 			}
@@ -831,40 +832,77 @@ sub mostrarLasEstadisticas {
 	}
 
 	%hashYears = &getHashYears(@filesToProcess);
-
-	foreach (@filesToProcess){
-		foreach my $theKey (sort { $filteredDataHash{$a} <=> $filteredDataHash{$b} } keys %filteredDataHash) {
-			my $yearAndCodigoNorma = `basename $theKey`;
-			my $year = `echo $yearAndCodigoNorma | cut -d '.' -f 1`;
-			my $codigoNorma = `echo $yearAndCodigoNorma | cut -d '.' -f 2`;
-			$resoluciones = 0;
-			$disposiciones = 0;
-			$convenios = 0;
-			if ("$codigoNorma" eq 'RES'){
-				$resoluciones = `wc -l < "$theKey"`;
-			}
-			if ("$codigoNorma" eq 'DIS'){
-				$disposiciones = `wc -l < "$theKey"`;
-			}
-			if ("$codigoNorma" eq 'CON'){
-				$convenios = `wc -l < "$theKey"`;
-			}
-			print "Gestión: Año:$year Emisores: \n";
-			print "Cantidad de resoluciones: $resoluciones\n";
-			print "Cantidad de disposiciones: $disposiciones\n";
-			print "Cantidad de convenios: $convenios\n";
+	$knowIfData = 0;
+	foreach my $theKey (sort { $hashYears{$a} <=> $hashYears{$b} } keys %hashYears) {
+		$knowIfData = 1;
+		chomp($theKey);
+		my $gestion = `echo $theKey | rev | cut -d '/' -f 2 | rev`;
+		chomp ($gestion);
+		my $yearAndCodigoNorma = `basename "$theKey"`;
+		chomp($yearAndCodigoNorma);
+		my $year = `echo "$yearAndCodigoNorma" | cut -d '.' -f 1`;
+		chomp($year);
+		my $codigoNorma = `echo "$yearAndCodigoNorma" | cut -d '.' -f 2`;
+		chomp($codigoNorma);
+		my $emisorKey = `head -1 "$theKey" | cut -d '_' -f 3`;		
+		chomp($emisorKey);
+		$resoluciones = 0;
+		$disposiciones = 0;
+		$convenios = 0;
+		if ("$codigoNorma" eq 'RES'){
+			$resoluciones = `wc -l < $theKey`;
+			chomp($resoluciones);
 		}
-		#push (@dataContent,`cat $_`);
+		if ("$codigoNorma" eq 'DIS'){
+			$disposiciones = `wc -l < $theKey`;
+			chomp($disposiciones);
+		}
+		if ("$codigoNorma" eq 'CON'){
+			$convenios = `wc -l < $theKey`;
+			chomp($convenios);
+		}
+		print "Gestión:$gestion Año:$year Emisores:$emisor{$emisorKey}\n";
+		print "Cantidad de resoluciones: $resoluciones\n";
+		print "Cantidad de disposiciones: $disposiciones\n";
+		print "Cantidad de convenios: $convenios\n";
+		print "#################################################################\n";
+
+		if ($ARGV[0] eq '-eg') {
+		print FILE "Gestión:$gestion Año:$year Emisores:$emisor{$emisorKey}\nCantidad de resoluciones: $resoluciones\nCantidad de disposiciones: $disposiciones\nCantidad de convenios: $convenios\n###################################\n";
+		}
 	}
+	if ($knowIfData == 0){
+		print "No se han encontrado resultados\n";
+	}
+}
+
+sub menuPreguntaSiSeguirViendoEstadisticas {
+	my($opcionElegida);
+
+	print color("red"),"\t¿Desea realizar otra estadística?[S/N]\n",color("reset");
+	$opcionElegida = <STDIN>;
+	$opcionElegida = uc $opcionElegida;
+	chomp($opcionElegida);
+	while($opcionElegida ne 'S' and $opcionElegida ne 'N'){		
+		print color("red"),"\t¿Desea realizar otra estadística?[S/N]\n",color("reset");
+		$opcionElegida = <STDIN>;
+		$opcionElegida = uc $opcionElegida;
+		chomp($opcionElegida);
+	}
+	if ($opcionElegida eq 'S'){
+		&menuEstadistica;
+	}
+	exit;
 }
 
 sub getHashYears {
 	my (@filesToProcess) = @_;
 	my (%retval);
 
-	foreach $directory (@filesToProcess){
+	foreach $directory (@filesToProcess){	
 		$var = `basename $directory`;
-		$var = `echo $year | cut -d '.' -f 1`;
+		$var = `echo "$var" | cut -d '.' -f 1`;
+		chomp($var);
 		$retval{$directory} = $var;
 	}
 	return (%retval);
