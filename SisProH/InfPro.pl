@@ -118,6 +118,12 @@ sub menuAyuda {
 	exit;
 }
 
+######################################################################################################################################
+######################################################################################################################################
+######################################################################################################################################
+######################################################################################################################################
+######################################################################################################################################
+
 sub menuConsulta {
 	&mostrarDataConsultas( &setOptionValuesConsulta(&getflagsConsulta) );	
 }
@@ -545,7 +551,7 @@ sub mostrarDataInformes {
 		my $contador = 1;
 		my $filePath;
 		while ( $salir == 0) {	
-			$filePath = "$INFODIR/resultados_$contador";
+			$filePath = "$INFODIR/informes_$contador";
 			if ( -e $filePath ){
 				$contador +=1;
 			}
@@ -559,13 +565,14 @@ sub mostrarDataInformes {
 	}
 
 	if($#ARGV == 0){
-		@filesToProcess = `ls $INFODIR`;
+		@filesToProcess = `ls \$INFODIR  | grep ^resultados_`;
 	}
 	else{
 		my $cont = 0;
-		foreach (@ARGV){
+		foreach $argument (@ARGV){
 			if ($cont > 0){
-				push(@filesToProcess,$ARGV[$cont]);
+				$argument = "resultados_$argument";
+				push(@filesToProcess,$argument);
 			}
 			$cont += 1;
 		}
@@ -779,8 +786,44 @@ sub palabraClaveABuscar {
 	return $retval;
 }
 
+######################################################################################################################################
+######################################################################################################################################
+######################################################################################################################################
+######################################################################################################################################
+######################################################################################################################################
+
 sub menuEstadistica {
 	print color("red"),"\n\t\tMenu de estadistica\n\n", color("reset");
+	&mostrarDataEstadistica(&setOptionValuesEstadistica);
+}
+
+sub mostrarDataEstadistica {
+	
+}
+
+
+sub setOptionValuesEstadistica {	
+	my ($yearDesde,$yearHasta,$gestion,@retval);
+
+	print "\nElija filtro de año desde (enter para todos los años)\n";
+	print ">";
+	$yearDesde = <STDIN>;
+	chomp($yearDesde);
+	if ("$yearDesde" eq ""){
+		$yearDesde = -1	#Que la linea vacia signifique todas
+	}
+	else{
+		print "\nElija filtro de año hasta\n";
+		print ">";
+		$yearDesde = <STDIN>;
+	}	
+
+	print "\nEscriba la gestión a buscar (enter para todos las gestiones)\n";
+	print ">";
+	$gestion = <STDIN>;
+	chomp($gestion);
+
+	@retval = ($yearDesde,$yearHasta,$gestion);
 }
 
 sub menuSuperAyuda {    
