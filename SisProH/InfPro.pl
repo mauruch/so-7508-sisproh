@@ -798,9 +798,78 @@ sub menuEstadistica {
 }
 
 sub mostrarDataEstadistica {
-	
+	my ($yearDesde,$yearHasta,$gestion) = @_;
+	my (@filesToProcess);
+	`reset`;
+
+	@filesToProcess = &applyFilterGestion($gestion);
+	@filesToProcess = &applyFilterYear($opcionDosDesde,$opcionDosHasta,@filesToProcess);
+	&mostrarLasEstadisticas(@filesToProcess);
 }
 
+sub mostrarLasEstadisticas {
+	my (@filesToProcess) =@_;
+	my (@dataContent,%hashYears);
+
+	if ($ARGV[0] eq '-eg') {
+	#Y aca debería escribir en un archivo
+		my $salir = 0;
+		my $contador = 1;
+		my $filePath;
+		while ( $salir == 0) {	
+			$filePath = "$INFODIR/resultados_$contador";
+			if ( -e $filePath ){
+				$contador +=1;
+			}
+			else {
+				$salir = 1;
+			}
+		}
+		unless(open FILE, '>'."$filePath") {
+			die "Unable to create $filePath";
+		}
+	}
+
+	%hashYears = &getHashYears(@filesToProcess);
+
+	foreach (@filesToProcess){
+		foreach my $theKey (sort { $filteredDataHash{$a} <=> $filteredDataHash{$b} } keys %filteredDataHash) {
+			my $yearAndCodigoNorma = `basename $theKey`;
+			my $year = `echo $yearAndCodigoNorma | cut -d '.' -f 1`;
+			my $codigoNorma = `echo $yearAndCodigoNorma | cut -d '.' -f 2`;
+			$resoluciones = 0;
+			$disposiciones = 0;
+			$convenios = 0;
+			if ("$codigoNorma" eq 'RES'){
+				$resoluciones = `wc -l < "$theKey"`;
+			}
+			if ("$codigoNorma" eq 'DIS'){
+				$disposiciones = `wc -l < "$theKey"`;
+			}
+			if ("$codigoNorma" eq 'CON'){
+				$convenios = `wc -l < "$theKey"`;
+			}
+			print "Gestión: Año:$year Emisores: \n";
+			print "Cantidad de resoluciones: $resoluciones\n";
+			print "Cantidad de disposiciones: $disposiciones\n";
+			print "Cantidad de convenios: $convenios\n";
+		}
+		#push (@dataContent,`cat $_`);
+	}
+}
+
+sub getHashYears {
+	my (@filesToProcess) = @_;
+	my (%retval);
+
+	foreach $directory (@filesToProcess){
+		$var = `basename $directory`;
+		$var = `echo $year | cut -d '.' -f 1`;
+		$retval{$directory} = $var;
+	}
+	return (%retval);
+	
+}
 
 sub setOptionValuesEstadistica {	
 	my ($yearDesde,$yearHasta,$gestion,@retval);
@@ -810,7 +879,8 @@ sub setOptionValuesEstadistica {
 	$yearDesde = <STDIN>;
 	chomp($yearDesde);
 	if ("$yearDesde" eq ""){
-		$yearDesde = -1	#Que la linea vacia signifique todas
+		$yearDesde = 0; 	#Que la linea vacia signifique todas
+		$yearHasta = 9999;
 	}
 	else{
 		print "\nElija filtro de año hasta\n";
