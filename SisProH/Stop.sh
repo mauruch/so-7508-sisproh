@@ -3,7 +3,16 @@
 #Shell script para detener procesos
 #Uso: Stop.sh nombreFunción
 
-functionToStop="$(ps -a | grep "$1" | awk '{print $1}')"
+if [ $# -ne 1 ]
+then
+	echo ""
+	echo -e '\t'"Stop llamado incorrectamente, se utiliza de la siguiente manera:"
+	echo -e '\t'">bash Stop.sh nombreProcesoATerminar"
+	exit 1
+fi
+
+functionToStop="$(ps -a | grep "$1$" | awk '{print $1}')"
+echo $functionToStop
 
 if [ "$functionToStop" = '' ]
 then

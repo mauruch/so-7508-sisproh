@@ -8,7 +8,8 @@ function sePuedeEjecutar(){
 	}
 
 function esta_corriendo(){
-
+	#There's options
+		#x="$(ps -a | grep "RecPro\.sh$")"
 		x=`ps -e | grep '^.* RecPro\.sh$'`
 		if [ $? -eq 0 ]; then
 			pid=`ps -e | grep '^.* RecPro\.sh$' | sed 's/ \?\([0-9]*\).*/\1/'`
@@ -18,6 +19,7 @@ function esta_corriendo(){
 		else
 			$BINDIR/RecPro.sh &	#Ejecuto RecPro.sh
 
+			#x="$(ps -a | grep "RecPro\.sh$")"
 			x=`ps -e | grep '^.* RecPro\.sh$'`
 			if [ $? -eq 0 ]; then
 				pid=`ps -e | grep '^.* RecPro\.sh$' | sed 's/ \?\([0-9]*\).*/\1/'`

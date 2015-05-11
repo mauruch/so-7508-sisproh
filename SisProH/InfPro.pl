@@ -91,6 +91,37 @@ sub decideWhatToDo {
 }
 
 sub checkeos {
+	#Checkeo que no se esté ejecutando ya
+	$checkIfAlreadyRunningLikeASpeedRunner = `ps -a | grep InfPro.pl\$`;
+	chomp($checkIfAlreadyRunningLikeASpeedRunner);
+	if ($checkIfAlreadyRunningLikeASpeedRunner ne ""){
+
+		my $bell = chr(7);
+		print $bell;
+		print color("red"),"\tWARNING!!!\n",color("reset");
+		print color("yellow"),"\tYa se encuentra una instancia de InfPro.pl corriendo\n",color("reset");
+		sleep 3;
+		print color("yellow"),"\tProcediento a auto-destruirse en 5 segundos...\n",color("reset");
+		sleep 4;
+		print color("green"),"\t5...\n",color("reset");
+		print $bell;
+		sleep 1;
+		print color("green"),"\t4...\n",color("reset");
+		print $bell;
+		sleep 1;
+		print color("blue"),"\t3...\n",color("reset");
+		print $bell;
+		sleep 1;
+		print color("blue"),"\t2...\n",color("reset");
+		print $bell;
+		sleep 1;
+		print color("red"),"\t1...\n",color("reset");
+		print $bell;
+		sleep 1;
+		print color("red"),"\tBOOM!!!!!!!!\n",color("reset");
+		exit;
+	}
+
 	#Acá checkeo si el ambiente fue inicializado
 	if ($MAEDIR eq ''){
 		print "No se ha inicializado el ambiente\n";
@@ -329,7 +360,7 @@ sub applyFilterYear {
 		@partialFiles = `ls $firstPartDir`;
 		foreach $lastPartDir (@partialFiles){			
 			$var = join('',$firstPartDir,$lastPartDir);
-			chomp ($var);
+			chomp ($var);			
 			push( @completeDir,$var );
 		}
 		push(@filesWithTheYears,@completeDir);
@@ -338,10 +369,10 @@ sub applyFilterYear {
 	foreach $totalPath (@filesWithTheYears){
 		$year = `basename $totalPath`;	#el cut es para files		
 		chomp($year);
-		$year = `echo $year | cut -d '.' -f 1`;
+		$year = `echo "$year" | cut -d '.' -f 1`;		
 		chomp($year);
 		if (($year >= $yearsWantedFrom) and ($year <= $yearsWantedTo)){
-			push (@retval, $totalPath);
+			push (@retval, $totalPath);			
 		}		
 	}
 	@retval;	#Acá ya voy devolviendo cosas como PROCDIR/Fernandez2/2007.WASD
@@ -923,14 +954,15 @@ sub setOptionValuesEstadistica {
 	else{
 		print "\nElija filtro de año hasta\n";
 		print ">";
-		$yearDesde = <STDIN>;
+		$yearHasta = <STDIN>;
+		chomp($yearHasta);
 	}	
 
 	print "\nEscriba la gestión a buscar (enter para todos las gestiones)\n";
 	print ">";
 	$gestion = <STDIN>;
 	chomp($gestion);
-
+	
 	@retval = ($yearDesde,$yearHasta,$gestion);
 }
 
