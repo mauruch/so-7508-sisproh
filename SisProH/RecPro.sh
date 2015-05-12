@@ -140,7 +140,6 @@ function valFormatoNombreArch(){
 				desde=`grep $codGestion';' $carpetaMaestros/gestiones.mae | cut -d';' -f2 --output-delimiter=$'\n'`
 				hasta=`grep $codGestion';' $carpetaMaestros/gestiones.mae | cut -d';' -f3 --output-delimiter=$'\n'`
 			
-				echo $desde
 				valFecha $desde
 				if [ $? -eq 1 ]
 				then
@@ -150,7 +149,6 @@ function valFormatoNombreArch(){
 					anyo=${desde:6:4}
 					desde=$anyo$mes$dia
 
-					echo $hasta
 					if [ -z $hasta ] || [ $hasta == 'NULL' ]
 					then
 						hasta=$(date +'%d/%m/%Y'); 
@@ -209,7 +207,7 @@ function valFormatoNombreArch(){
 		fi
 		
 	else
-		mensaje="Cantidad de campos inválido"
+		mensaje="Campo inválido"
 		$GRUPO/Glog.sh $nombreScript "El archivo $1 ha sido rechazado por: $mensaje"
 		return 0
 	fi
@@ -282,8 +280,13 @@ function detectarArribos(){
 			pid=`pgrep feprima.sh`
 			$GRUPO/Glog.sh  $nombreScript "ProPro ya corriendo bajo el no.: $pid"
 		else
-			$BINDIR/ProPro.sh &
-			$GRUPO/Glog.sh  $nombreScript "ProPro corriendo bajo el no.: $!"
+			retorno=$BINDIR/ProPro.sh &
+			if [ $? -eq 0 ]
+			then
+				$GRUPO/Glog.sh  $nombreScript "ProPro corriendo bajo el no.: $!"
+			else
+				$GRUPO/Glog.sh  $nombreScript "ProPro no se pudo inicializar"
+			fi
 		fi
 
 	fi
