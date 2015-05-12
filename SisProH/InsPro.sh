@@ -84,8 +84,26 @@ for (( i=0;i<11;i++)); do
 
 	#Checkeo si hay suficiente espacio
 	if [ $k = "DATASIZE" ]; then
-		finalSize=$(bash "$GRUPO/CheckSpaceDisk.sh")
-		eval $k=$finalSize
+
+		
+		#devuelve espacio en disco, por ej: 5000M
+		diskSizeMB=`df -Ph -BM . | awk 'NR==2 {print $4}'`
+
+		#remuevo el 'M'
+		size=${diskSizeMB::-1}
+
+		#mientras que el usuario no ingrese un tamaño menor que el disco
+		while [ $DATASIZE -gt $size ]
+		do
+			echo "Insuficiente espacio en disco."
+			echo "Espacio disponible: $size Mb."
+			echo "Espacio requerido $DATASIZE Mb"
+			echo "Cancele la instalación o inténtelo nuevamente."
+			read newDataSize
+			DATASIZE=$newDataSize
+		done
+
+		eval $k=$DATASIZE
 		eval val=\${"$k"}
 		#export DATASIZE con el nuevo valor
 		export $k
@@ -267,7 +285,7 @@ bash $GRUPO/Glog.sh "InsPro.sh" "Instalando Programas y Funciones"
 lsScriptsResult=`ls | grep '\.\(sh\|pl\)$'`
 currentDirectory=`pwd`
 for f in $lsScriptsResult; do
-  if [ $f != "Glog.sh" ] && [ $f != "Mover.sh" ] && [ $f != "InsPro.sh" ] && [ $f != "CheckSisProIns.sh" ] && [ $f != "CheckSpaceDisk.sh" ]; then  
+  if [ $f != "Glog.sh" ] && [ $f != "Mover.sh" ] && [ $f != "InsPro.sh" ] && [ $f != "CheckSisProIns.sh" ]; then  
     	bash $GRUPO/Mover.sh "$currentDirectory/$f" "$BINDIR" "InsPro.sh"
   fi
 done

@@ -159,7 +159,7 @@ if [ ! $e -eq 0 ]; then
 				lsScriptsResult=`ls | grep '\.\(sh\|pl\)$'`
 				currentDirectory=`pwd`
 				for f in $lsScriptsResult; do
-				  if [ $f != "Glog.sh" ] && [ $f != "Mover.sh" ] && [ $f != "InsPro.sh" ] && [ $f != "CheckSisProIns.sh" ] && [ $f != 							"CheckSpaceDisk.sh" ]; then  
+				  if [ $f != "Glog.sh" ] && [ $f != "Mover.sh" ] && [ $f != "InsPro.sh" ] && [ $f != "CheckSisProIns.sh" ]; then  
 						bash $GRUPO/Mover.sh "$currentDirectory/$f" "$BINDIR" "InsPro.sh"
 				  fi
 				done
