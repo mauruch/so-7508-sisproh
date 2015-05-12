@@ -570,8 +570,7 @@ sub menuPreguntaSiSeguirConsultando {
 
 sub menuInforme {
 	print color("red"),"\n\t\tMenu de informe\n\n", color("reset");
-	my $keyWord = &palabraClaveABuscar;
-	&mostrarDataInformes($keyword, ( &setOptionValuesConsulta(&getflagsConsulta) ) );
+	&mostrarDataInformes(&palabraClaveABuscar, ( &setOptionValuesConsulta(&getflagsConsulta) ) );
 	&menuPreguntaSiSeguirViendoInformes;
 }
 
@@ -632,13 +631,14 @@ sub mostrarDataInformes {
 	if ($opcionCinco ne ""){
 		@dataToFilter = &filterInformeEmisor($opcionCinco,@dataToFilter);
 	}	#Lo aplico sólo si no lo dejé vacío
-	if ($keyWord ne ""){
+	if ($keyWord ne ""){		
 		my %hashValues = &filterInformeKeyWord($keyWord,@dataToFilter);
 		my $knowIfData = 0;
-		foreach my $theKey (sort { $filteredDataHash{$b} <=> $filteredDataHash{$a} } keys %filteredDataHash) {
-			if ($filteredDataHash{$theKey} > 0) {
+		foreach my $theKey (sort { $hashValues{$b} <=> $hashValues{$a} } keys %hashValues) {			
+			if ($hashValues{$theKey} > 0) {
 				$knowIfData = 1;
 				my @keyArrayed = split (";", $theKey);
+				my $showThis;
 				$codigoGestion = `echo $keyArrayed[0] | cut -d '_' -f 1`;
 				chomp ($codigoGestion);
 				$codigoNorma = `echo $keyArrayed[0] | cut -d '_' -f 2`;
@@ -646,8 +646,27 @@ sub mostrarDataInformes {
 				$codigoEmisor = `echo $keyArrayed[0] | cut -d '_' -f 3`;
 				chomp ($codigoEmisor);
 				#TODO tengo el codigo de emisor pero no el emisor, de ultima leo el archivo y me armo el hash
-				print "############################################################################################\n";  		
-				print "$theKey";   						
+				print "############################################################################################\n";
+				$showThis = `echo "$theKey" | cut -d ';' -f 1`;
+				chomp($showThis);
+				print "$showThis";
+				$showThis = `echo "$theKey" | cut -d ';' -f 2`;
+				chomp($showThis);
+				$showThis =~ s/;/ /g;
+				print "$emisor{$showThis}($showThis)";
+				$showThis = `echo "$theKey" | cut -d ';' -f 4`;
+				chomp($showThis);
+				print "$showThis/";
+				$showThis = `echo "$theKey" | cut -d ';' -f 4-7`;  	
+				chomp($showThis);
+				$showThis =~ s/;/ /g;
+				print "$showThis Peso=$hashValues{$theKey}\n";
+				$showThis = `echo "$theKey" | cut -d ';' -f 8`;
+				chomp($showThis);
+				print "$showThis\n";
+				$showThis = `echo "$theKey" | cut -d ';' -f 9`;
+				chomp($showThis);
+				print "$showThis\n";	
 				if ($ARGV[0] eq '-ig') {
 					#Y aca debería escribir en un archivo
 					print FILE "$theKey";   				
@@ -742,11 +761,11 @@ sub filterInformeKeyWord {
 			if ($keyWord eq $word) {
 				$totalPowerOfTheLineOfData += 1;
 			}
-		}
+		}		
+		chomp($lineOfData);		
 		$retvalhash{$lineOfData} = $totalPowerOfTheLineOfData;
 	}
 	return (%retvalhash);
-
 }
 
 sub filterInformeGestion {
