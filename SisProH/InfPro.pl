@@ -409,7 +409,8 @@ sub applyFilterGestion {
 	else {
 		foreach (@gestionDirectory){
 			chomp ($_);
-			if ($_ ne "proc"){
+			my $var = `echo "$_" | cut -d '.' -f 2`;
+			if ($_ ne "proc" and $var ne "rech"){
 				push (@retval, "$baseDir$_/");
 			}
 		}

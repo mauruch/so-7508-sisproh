@@ -9,6 +9,7 @@ carpetaNovedades=$NOVEDIR
 carpetaAceptados=$ACEPDIR
 carpetaRechazados=$RECHDIR
 carpetaMaestros=$MAEDIR
+numeroDeArchivosAceptados=0
 
 
 DORMIR_RECPRO=60
@@ -29,6 +30,7 @@ function aceptarArch {
 	mkdir -p "$carpetaAceptados/$codGestion"
 	$GRUPO/Mover.sh "$carpetaNovedades/$1" "$carpetaAceptados/$codGestion"
 	$GRUPO/Glog.sh $nombreScript "El archivo $1 ha sido aceptado y movido a la carpeta $carpetaAceptados/$codGestion"
+	numeroDeArchivosAceptados=$((numeroDeArchivosAceptados+1))
 
 }
 
@@ -280,7 +282,9 @@ function detectarArribos(){
 			pid=`pgrep feprima.sh`
 			$GRUPO/Glog.sh  $nombreScript "ProPro ya corriendo bajo el no.: $pid"
 		else
-			retorno=$BINDIR/ProPro.sh &
+			export numeroDeArchivosAceptados
+			$BINDIR/ProPro.sh &
+			numeroDeArchivosAceptados=0
 			if [ $? -eq 0 ]
 			then
 				$GRUPO/Glog.sh  $nombreScript "ProPro corriendo bajo el no.: $!"
