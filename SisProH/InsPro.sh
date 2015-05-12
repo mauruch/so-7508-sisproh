@@ -193,8 +193,7 @@ do
 	clear
 
 	#llamo a la funcion para que imprima las variables
-	#TODO: HACER OTRA FUNCION
-	#bash $GRUPO/CheckSisProIns.sh "showVariables"
+	bash $GRUPO/ShowVariables.sh
 
 	echo "Estado de la instalación: LISTA"
 
@@ -220,6 +219,11 @@ done
 
 echo "Iniciando Instalación. Esta Ud. seguro? (s/n)"
 read confirmInstall
+while [ "$confirmInstall" != "s" ] && [ "$confirmInstall" != "n" ] 
+do
+	echo "Ingreso inválido... Inicia la instalación? (s/n)"
+	read confirmInstall
+done
 
 echo -e "\n"
 
@@ -254,6 +258,9 @@ if [ "$confirmInstall" = "s" ]; then
 			fi
 		fi
 	done
+
+else
+	exit 1
 fi
 
 echo -e "\n"
