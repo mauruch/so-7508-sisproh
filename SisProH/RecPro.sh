@@ -63,38 +63,29 @@ function valExtensionArch(){
 function valFecha(){
 diasMeses=(31 29 31 30 31 30 31 31 30 31 30 31)
 
-	#if [ $1 == "NULL" ]
-	#then
-	#	fecha=$(date +'%Y%m%d')
-	#	return $fecha
+	nombreValido=`echo $1 | grep '^[0-3][0-9][/,-][0-1][0-9][/,-][0-9][0-9][0-9][0-9]$' | wc -l`
 		
-	#else
-		nombreValido=`echo $1 | grep '^[0-3][0-9][/,-][0-1][0-9][/,-][0-9][0-9][0-9][0-9]$' | wc -l`
-		
-		if [ $nombreValido -eq 1 ]
+	if [ $nombreValido -eq 1 ]
+	then
+		dia=${1:0:2}
+		mes=${1:3:2}
+		if [ $mes -le 12 ]
 		then
-			dia=${1:0:2}
-			mes=${1:3:2}
-			if [ $mes -le 12 ]
-			then
-				let mes=$mes-1
-				var=${diasMeses[$mes]}
-				if [ $dia-gt$var ]
-				then	
-					return 1
-					
-				fi
-			else
-				return 0
+			let mes=$mes-1
+			var=${diasMeses[$mes]}
+			if [ $dia-gt$var ]
+			then	
+				return 1
+				
 			fi
 		else
 			return 0
-
 		fi
-	
+	else
 		return 0
-	#fi
+	fi
 
+	return 0
 
 }
 
@@ -105,7 +96,7 @@ function valFormatoNombreArch(){
 	nombre=$1
 	mensajeError=( "Gestión Inexistente" "Norma Inexistente" "Emisor Inexistente" "-" "Fecha Fuera de Rango" "Fecha Inválida" )
 
-	formatoNombre='^[A-Z,a-z,0-9]*_[A-Z]*_[0-9]*_[0-9]*_[0-3][0-9]-[0-1][0-9]-[0-9][0-9][0-9][0-9]$'
+	formatoNombre='^[A-Z,a-z,0-9]*_[A-Z]*_[0-9]*_[0-9]*_[0-9][0-9]-[0-9][0-9]-[0-9][0-9][0-9][0-9]$'
 	nombreValido=`echo "$nombre" | grep "$formatoNombre" | wc -l`
 	
 	if [ $nombreValido -eq 1 ]
@@ -163,8 +154,7 @@ function valFormatoNombreArch(){
 					if [ -z $hasta ] || [ $hasta == 'NULL' ]
 					then
 						hasta=$(date +'%d/%m/%Y'); 
-						echo "hoy es" $hasta
-
+						
 					fi
 					
 					valFecha $hasta
@@ -175,8 +165,7 @@ function valFormatoNombreArch(){
 						mes=${hasta:3:2}
 						anyo=${hasta:6:4}
 						hasta=$anyo$mes$dia
-						echo "Debe aparecer año mes día " $hasta
-						
+												
 						if [ $validar -gt $hasta ] || [ $validar -lt $desde ]
 						then
 							nombreValido=0
@@ -297,9 +286,6 @@ function detectarArribos(){
 			$GRUPO/Glog.sh  $nombreScript "ProPro corriendo bajo el no.: $!"
 		fi
 
-		
-
-	
 	fi
 }
 
