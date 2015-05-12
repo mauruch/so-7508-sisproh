@@ -476,7 +476,7 @@ sub setOptionValuesConsulta {
 		print "\nEscriba emisor a buscar:\n";
 		print ">";
 		$opcionCinco = <STDIN>;
-		chomp($opcionCinco);
+		chomp($opcionCinco);	
 	}
 	else{
 		$opcionCinco = "";
@@ -691,6 +691,7 @@ sub filterInformeEmisor {
 	foreach $data (@dataToFilter){
 		my $suEmisor = `echo "$data" | cut -d ';' -f 6`;
 		chomp($suEmisor);
+		chomp($suEmisor);
 		if( "$emisor" eq "$suEmisor"){
 			push (@retval,$data);
 		}
@@ -792,15 +793,12 @@ sub filterInformeYear {
 
 sub filterInformeTipoNorma {
 	my ($tipoNorma,@filesToProcess) = @_;
-	my (@retval, @files,@chompedFiltering);
+	my (@retval,@chompedFiltering);
 
-	foreach (@filesToProcess) {
-		$dirOfFile = "$INFODIR/$_";
-		push (@files,$dirOfFile);
-	}
 	
 	if ($tipoNorma eq ''){
-		foreach $filedir (@files){
+		foreach $filedir (@filesToProcess){
+			chomp($filedir);
 			if(-e $filedir ){
 				push (@retval,`cat $filedir`);
 			}
@@ -808,7 +806,7 @@ sub filterInformeTipoNorma {
 		return (@retval);
 	}
 	else{
-		foreach (@files){
+		foreach (@filesToProcess){
 			if(-e $filedir ){
 				push (@currentlyFiltering,`cat $_`);
 			}		
