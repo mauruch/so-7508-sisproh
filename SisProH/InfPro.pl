@@ -209,7 +209,7 @@ sub mostrarDataConsultas {
 						$codigoEmisor = `echo $keyArrayed[0] | cut -d '_' -f 3`;
 						chomp ($codigoEmisor);
 		   				#TODO tengo el codigo de emisor pero no el emisor, de ultima leo el archivo y me armo el hash
-		   				print "############################################################################################\n";  		
+		   				print color("blue"),"\n\t\t--BARRA SEPARADORA DE BAJA CALIDAD--\n\n",color("reset"); 		
 		   				print "$codigoNorma $emisor($codigoEmisor) $keyArrayed[2]/$keyArrayed[3] $codigoGestion $keyArrayed[1] Peso=$filteredDataHash{$theKey}\n";
 		   				print "$keyArrayed[4]\n";
 		   				print "$keyArrayed[5]\n";   						
@@ -235,7 +235,7 @@ sub mostrarDataConsultas {
 					$codigoEmisor = `echo $keyArrayed[0] | cut -d '_' -f 3`;
 					chomp ($codigoEmisor);
 					#TODO tengo el codigo de emisor pero no el emisor, de ultima leo el archivo y me armo el hash
-					print "############################################################################################\n";  		
+					print color("blue"),"\n\t\t--BARRA SEPARADORA DE BAJA CALIDAD--\n\n",color("reset");  		
 		   			print "$codigoNorma $emisor{$codigoEmisor}($codigoEmisor) $keyArrayed[2]/$keyArrayed[3] $codigoGestion $keyArrayed[1]\n";
 					print "$keyArrayed[4]\n";
 					print "$keyArrayed[5]\n";
@@ -636,24 +636,18 @@ sub mostrarDataInformes {
 		my $knowIfData = 0;
 		foreach my $theKey (sort { $hashValues{$b} <=> $hashValues{$a} } keys %hashValues) {			
 			if ($hashValues{$theKey} > 0) {
-				$knowIfData = 1;
-				my @keyArrayed = split (";", $theKey);
+				$knowIfData = 1;			
 				my $showThis;
-				$codigoGestion = `echo $keyArrayed[0] | cut -d '_' -f 1`;
-				chomp ($codigoGestion);
-				$codigoNorma = `echo $keyArrayed[0] | cut -d '_' -f 2`;
-				chomp ($codigoNorma);
-				$codigoEmisor = `echo $keyArrayed[0] | cut -d '_' -f 3`;
-				chomp ($codigoEmisor);
-				#TODO tengo el codigo de emisor pero no el emisor, de ultima leo el archivo y me armo el hash
-				print "############################################################################################\n";
+				print color("blue"),"\n\t\t--BARRA SEPARADORA DE BAJA CALIDAD--\n\n",color("reset");
 				$showThis = `echo "$theKey" | cut -d ';' -f 1`;
 				chomp($showThis);
-				print "$showThis";
+				print "$showThis\t";
 				$showThis = `echo "$theKey" | cut -d ';' -f 2`;
+				chomp($showThis);				
+				print "$showThis";
+				$showThis = `echo "$theKey" | cut -d ';' -f 3`;
 				chomp($showThis);
-				$showThis =~ s/;/ /g;
-				print "$emisor{$showThis}($showThis)";
+				print "($showThis)\t";
 				$showThis = `echo "$theKey" | cut -d ';' -f 4`;
 				chomp($showThis);
 				print "$showThis/";
@@ -688,8 +682,37 @@ sub mostrarDataInformes {
 			}
 			#http://stackoverflow.com/questions/2491471/how-can-i-sort-dates-in-perl
 			foreach my $theKey (sort { join('', (split '/', $a)[2,1,0]) cmp join('', (split '/', $b)[2,1,0]) } keys %filteredDataHash) {
-				print "############################################################################################\n";  		
-				print "$theKey";
+				my $showThis;
+				print color("blue"),"\n\t\t--BARRA SEPARADORA DE BAJA CALIDAD--\n\n",color("reset");
+				$showThis = `echo "$theKey" | cut -d ';' -f 1`;
+				chomp($showThis);
+				chomp($showThis);
+				print "$showThis\t";
+				$showThis = `echo "$theKey" | cut -d ';' -f 2`;
+				chomp($showThis);
+				chomp($showThis);			
+				print "$showThis";
+				$showThis = `echo "$theKey" | cut -d ';' -f 3`;
+				chomp($showThis);
+				chomp($showThis);
+				print "($showThis)\t";
+				$showThis = `echo "$theKey" | cut -d ';' -f 4`;
+				chomp($showThis);
+				chomp($showThis);
+				print "$showThis/";
+				$showThis = `echo "$theKey" | cut -d ';' -f 4-7`;  	
+				chomp($showThis);
+				chomp($showThis);
+				$showThis =~ s/;/ /g;
+				print "$showThis\n";
+				$showThis = `echo "$theKey" | cut -d ';' -f 8`;
+				chomp($showThis);
+				chomp($showThis);
+				print "$showThis\n";
+				$showThis = `echo "$theKey" | cut -d ';' -f 9`;
+				chomp($showThis);
+				chomp($showThis);
+				print "$showThis\n";
 				if ($ARGV[0] eq '-ig') {
 					#Y aca debería escribir en un archivo
 					print FILE "$theKey";
@@ -701,21 +724,6 @@ sub mostrarDataInformes {
 		}
 
 	}
-}
-
-sub filterInformeEmisor {
-	my ($emisor,@dataToFilter) = @_;
-	my (@retval);
-
-	foreach $data (@dataToFilter){
-		my $suEmisor = `echo "$data" | cut -d ';' -f 6`;
-		chomp($suEmisor);
-		chomp($suEmisor);
-		if( "$emisor" eq "$suEmisor"){
-			push (@retval,$data);
-		}
-	}
-	return (@retval);
 }
 
 sub menuPreguntaSiSeguirViendoInformes {
@@ -770,17 +778,34 @@ sub filterInformeKeyWord {
 
 sub filterInformeGestion {
 	my ($gestion,@dataToFilter) = @_;
+	my (@retval);
 
 	foreach $line (@dataToFilter){
 		$gestionSacada = `echo "$line" | cut -d ';' -f 6`;
 		chomp($gestionSacada);
-		chomp($line);
+		chomp($gestionSacada);	
 		if ( "$gestionSacada" eq "$gestion" ){				
 			push (@retval, $line);
 		}
 	}
 	return (@retval);
 }
+
+sub filterInformeEmisor {
+	my ($emisor,@dataToFilter) = @_;
+	my (@retval);
+
+	foreach $data (@dataToFilter){
+		my $suEmisor = `echo "$data" | cut -d ';' -f 3`;
+		chomp($suEmisor);
+		chomp($suEmisor);
+		if( "$emisor" eq "$suEmisor"){
+			push (@retval,$data);
+		}
+	}
+	return (@retval);
+}
+
 
 sub filterInformeNumeroNorma {
 	my ($normaDesde,$normaHasta,@dataToFilter) = @_;
@@ -934,8 +959,7 @@ sub mostrarLasEstadisticas {
 		print "Cantidad de resoluciones: $resoluciones\n";
 		print "Cantidad de disposiciones: $disposiciones\n";
 		print "Cantidad de convenios: $convenios\n";
-		print "#################################################################\n";
-
+		print color("blue"),"\n\t\t--BARRA SEPARADORA DE BAJA CALIDAD--\n\n",color("reset");
 		if ($ARGV[0] eq '-eg') {
 		print FILE "Gestión:$gestion Año:$year Emisores:$emisor{$emisorKey}\nCantidad de resoluciones: $resoluciones\nCantidad de disposiciones: $disposiciones\nCantidad de convenios: $convenios\n###################################\n";
 		}
