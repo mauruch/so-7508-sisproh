@@ -7,13 +7,7 @@ export CONFDIR="$GRUPO/conf"
 #De esta forma se los va a poder llamar de esta forma `./Mover.sh`
 chmod +x InsPro.sh
 chmod +x Glog.sh
-chmod +x InfPro.pl
-chmod +x IniPro.sh
 chmod +x Mover.sh
-chmod +x ProPro.sh
-chmod +x RecPro.sh
-chmod +x Start.sh
-chmod +x Stop.sh
 
 function instalarDesdeCualquierLugar(){
 if [ $PWD != $GRUPO ] && [ -d $GRUPO ]
@@ -147,10 +141,12 @@ if perl < /dev/null > /dev/null 2>&1  ; then
 	else
 		bash $GRUPO/Glog.sh "InsPro" "Para instalar el TP es necesario contar con Perl 5 o superior. Efectúe su instalación e inténtelo 		nuevamente. \n Proceso de Instalación Cancelado" "ERROR"
 		echo -e "Para instalar el TP es necesario contar con Perl 5 o superior. Efectúe su instalación e inténtelo nuevamente. \n Proceso de 			Instalación Cancelado"
+		exit 1
 	fi
 else
 	bash $GRUPO/Glog.sh "InsPro" "Para instalar el TP es necesario contar con Perl 5 o superior. Efectúe su instalación e inténtelo 			nuevamente. \n Proceso de Instalación Cancelado" "ERROR"
     echo -e "Para instalar el TP es necesario contar con Perl 5 o superior. Efectúe su instalación e inténtelo nuevamente. \n Proceso de 		Instalación Cancelado"
+	exit 1
 fi
 
 
@@ -179,7 +175,8 @@ do
 	clear
 
 	#llamo a la funcion para que imprima las variables
-	bash $GRUPO/CheckSisProIns.sh "showVariables"
+	#TODO: HACER OTRA FUNCION
+	#bash $GRUPO/CheckSisProIns.sh "showVariables"
 
 	echo "Estado de la instalación: LISTA"
 
@@ -270,8 +267,8 @@ bash $GRUPO/Glog.sh "InsPro.sh" "Instalando Programas y Funciones"
 lsScriptsResult=`ls | grep '\.\(sh\|pl\)$'`
 currentDirectory=`pwd`
 for f in $lsScriptsResult; do
-  if [ $f != "Glog.sh" ] && [ $f != "Mover.sh" ]; then  
-    bash $GRUPO/Mover.sh "$currentDirectory/$f" "$BINDIR" "InsPro.sh"
+  if [ $f != "Glog.sh" ] && [ $f != "Mover.sh" ] && [ $f != "InsPro.sh" ] && [ $f != "CheckSisProIns.sh" ] && [ $f != "CheckSpaceDisk.sh" ]; then  
+    	bash $GRUPO/Mover.sh "$currentDirectory/$f" "$BINDIR" "InsPro.sh"
   fi
 done
 
