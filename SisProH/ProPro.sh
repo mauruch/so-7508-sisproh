@@ -1,113 +1,115 @@
+
 #Comando para la Protocolización
 
 nombreScript=`basename "$0"`
 $GRUPO/Glog.sh "$nombreScript" "Inicio de ProPro" "INFO"
+$GRUPO/Glog.sh "$nombreScript" "Cantidad de archivos a procesar ""$numeroDeArchivosAceptados" "INFO"
 
 cd $ACEPDIR
 contador=0
 if [ -d Peron1 ]; then
-	ARRAY[$contador]="Peron1"
-	contador=$((contador+1))
+    ARRAY[$contador]="Peron1"
+    contador=$((contador+1))
 fi
 if [ -d Peron2 ]; then
-	ARRAY[$contador]="Peron2"
-	contador=$((contador+1))
+    ARRAY[$contador]="Peron2"
+    contador=$((contador+1))
 fi
 if [ -d Lonardi ]; then
-	ARRAY[$contador]="Lonardi"
-	contador=$((contador+1))
+    ARRAY[$contador]="Lonardi"
+    contador=$((contador+1))
 fi
 if [ -d Aramburu ]; then
-	ARRAY[$contador]="Aramburu"
-	contador=$((contador+1))
+    ARRAY[$contador]="Aramburu"
+    contador=$((contador+1))
 fi
 if [ -d Guido ]; then
-	ARRAY[$contador]="Guido"
-	contador=$((contador+1))
+    ARRAY[$contador]="Guido"
+    contador=$((contador+1))
 fi
 if [ -d Illia ]; then
-	ARRAY[$contador]="Illia"
-	contador=$((contador+1))
+    ARRAY[$contador]="Illia"
+    contador=$((contador+1))
 fi
 if [ -d Lanusse ]; then
-	ARRAY[$contador]="Lanusse"
-	contador=$((contador+1))
+    ARRAY[$contador]="Lanusse"
+    contador=$((contador+1))
 fi
 if [ -d Campora ]; then
-	ARRAY[$contador]="Campora"
-	contador=$((contador+1))
+    ARRAY[$contador]="Campora"
+    contador=$((contador+1))
 fi
 if [ -d Lastiri ]; then
-	ARRAY[$contador]="Lastiri"
-	contador=$((contador+1))
+    ARRAY[$contador]="Lastiri"
+    contador=$((contador+1))
 fi
 if [ -d Peron3 ]; then
-	ARRAY[$contador]="Peron3"
-	contador=$((contador+1))
+    ARRAY[$contador]="Peron3"
+    contador=$((contador+1))
 fi
 if [ -d Martinez ]; then
-	ARRAY[$contador]="Martinez"
-	contador=$((contador+1))
+    ARRAY[$contador]="Martinez"
+    contador=$((contador+1))
 fi
 if [ -d Videla ]; then
-	ARRAY[$contador]="Videla"
-	contador=$((contador+1))
+    ARRAY[$contador]="Videla"
+    contador=$((contador+1))
 fi
 if [ -d Viola ]; then
-	ARRAY[$contador]="Viola"
-	contador=$((contador+1))
+    ARRAY[$contador]="Viola"
+    contador=$((contador+1))
 fi
 if [ -d Galtieri ]; then
-	ARRAY[$contador]="Galtieri"
-	contador=$((contador+1))
+    ARRAY[$contador]="Galtieri"
+    contador=$((contador+1))
 fi
 if [ -d Bignone ]; then
-	ARRAY[$contador]="Bignone"
-	contador=$((contador+1))
+    ARRAY[$contador]="Bignone"
+    contador=$((contador+1))
 fi
 if [ -d Alfonsin ]; then
-	ARRAY[$contador]="Alfonsin"
-	contador=$((contador+1))
+    ARRAY[$contador]="Alfonsin"
+    contador=$((contador+1))
 fi
 if [ -d Menem1 ]; then
-	ARRAY[$contador]="Menem1"
-	contador=$((contador+1))
+    ARRAY[$contador]="Menem1"
+    contador=$((contador+1))
 fi
 if [ -d Menem2 ]; then
-	ARRAY[$contador]="Menem2"
-	contador=$((contador+1))
+    ARRAY[$contador]="Menem2"
+    contador=$((contador+1))
 fi
 if [ -d Rua ]; then
-	ARRAY[$contador]="Rua"
-	contador=$((contador+1))
+    ARRAY[$contador]="Rua"
+    contador=$((contador+1))
 fi
 if [ -d Puerta ]; then
-	ARRAY[$contador]="Puerta"
-	contador=$((contador+1))
+    ARRAY[$contador]="Puerta"
+    contador=$((contador+1))
 fi
 if [ -d Saa ]; then
-	ARRAY[$contador]="Saa"
-	contador=$((contador+1))
+    ARRAY[$contador]="Saa"
+    contador=$((contador+1))
 fi
 if [ -d Caamaño ]; then
-	ARRAY[$contador]="Caamaño"
-	contador=$((contador+1))
+    ARRAY[$contador]="Caamaño"
+    contador=$((contador+1))
 fi
 if [ -d Duhalde ]; then
-	ARRAY[$contador]="Duhalde"
-	contador=$((contador+1))
+    ARRAY[$contador]="Duhalde"
+    contador=$((contador+1))
 fi
 if [ -d Kirchner ]; then
-	ARRAY[$contador]="Kirchner"
-	contador=$((contador+1))
+    ARRAY[$contador]="Kirchner"
+    contador=$((contador+1))
 fi
 if [ -d Fernandez ]; then
-	ARRAY[$contador]="Fernandez"
-	contador=$((contador+1))
+    ARRAY[$contador]="Fernandez"
+    contador=$((contador+1))
 fi
 if [ -d Fernandez2 ]; then
-	ARRAY[$contador]="Fernandez2"
-	contador=$((contador+1))
+    ARRAY[$contador]="Fernandez2"
+    contador=$((contador+1))
 fi
 
 contadorAceptados=0
@@ -134,8 +136,8 @@ fi
 contadorAux=1
 for var in {0..8} 
 do
-	REGISTRO[$var]="$(echo "$1" | cut -d ';' -f "$contadorAux")"
-	contadorAux=$((contadorAux+1))
+    REGISTRO[$var]="$(echo "$1" | cut -d ';' -f "$contadorAux")"
+    contadorAux=$((contadorAux+1))
 done
 echo "$3"";""${REGISTRO[0]}"";""${REGISTRO[1]}"";""$anio"";""${REGISTRO[2]}"";""${REGISTRO[3]}"";""${REGISTRO[4]}"";""${REGISTRO[5]}"";""${REGISTRO[6]}"";""${REGISTRO[7]}"";""${REGISTRO[8]}" >> $archivo
 
@@ -162,12 +164,12 @@ AgregarContadorALaTabla(){
 #si es la primera vez que se actualiza, mueve al archivo
 $GRUPO/Glog.sh "$nombreScript" "Se agrego un contador a la tabla de contadores" "INFO"
 if [ -e $MAEDIR/tab/axg.tab ]; then
-	cd $MAEDIR/tab
-	if [ ! -d "ant" ]; then
-  		mkdir "ant"
-	fi	
-	$GRUPO/Glog.sh "$nombreScript" “tabla de contadores preservada antes de su modificación en $MAEDIR/tab/ant” "INFO"
-	$GRUPO/Mover.sh $MAEDIR/tab/axg.tab $MAEDIR/tab/ant ProPro.sh
+    cd $MAEDIR/tab
+    if [ ! -d "ant" ]; then
+          mkdir "ant"
+    fi    
+    $GRUPO/Glog.sh "$nombreScript" “tabla de contadores preservada antes de su modificación en $MAEDIR/tab/ant” "INFO"
+    $GRUPO/Mover.sh $MAEDIR/tab/axg.tab $MAEDIR/tab/ant ProPro.sh
 fi
 cd $MAEDIR/tab
 ultimoId="$(tail -1 axgAux | cut -d ';' -f 1)"
@@ -183,12 +185,12 @@ ActualizarContadorDeLaTabla(){
 #si es la primera vez que se actualiza, mueve al archivo
 $GRUPO/Glog.sh "$nombreScript" "Se actualizo un contador de la tabla de contadores" "INFO"
 if [ -e $MAEDIR/tab/axg.tab ]; then
-	cd $MAEDIR/tab
-	if [ ! -d "ant" ]; then
-  		mkdir "ant"
-	fi	
-	$GRUPO/Glog.sh "$nombreScript" “tabla de contadores preservada antes de su modificación en $MAEDIR/tab/ant” "INFO"
-	$GRUPO/Mover.sh $MAEDIR/tab/axg.tab $MAEDIR/tab/ant ProPro.sh
+    cd $MAEDIR/tab
+    if [ ! -d "ant" ]; then
+          mkdir "ant"
+    fi    
+    $GRUPO/Glog.sh "$nombreScript" “tabla de contadores preservada antes de su modificación en $MAEDIR/tab/ant” "INFO"
+    $GRUPO/Mover.sh $MAEDIR/tab/axg.tab $MAEDIR/tab/ant ProPro.sh
 fi
 cd $MAEDIR/tab
 normaActual="$1"
@@ -218,19 +220,19 @@ codigoEmisor="$(echo "$2" | cut -d '_' -f 3)"
 codigoNorma="$(echo "$2" | cut -d '_' -f 2)"
 regex="$codigoGestion"";""$anioEnCurso"";""$codigoEmisor"";""$codigoNorma"";"
 if [ -e $MAEDIR/tab/axg.tab ]; then
-	cat $MAEDIR/tab/axg.tab > $MAEDIR/tab/axgAux
+    cat $MAEDIR/tab/axg.tab > $MAEDIR/tab/axgAux
 fi
 cd $MAEDIR/tab
 norma="$(grep "$regex" axgAux | cut -d ";" -f 6)"
 if [ -z "$norma" ]; then
-	norma=1
-	registro="$( echo "$1" | sed s/";;"/";"$norma";"/g)"
-	GrabarRegistroProtocolizado "$registro" "$3" "$2"
-	AgregarContadorALaTabla "$regex"
+    norma=1
+    registro="$( echo "$1" | sed s/";;"/";"$norma";"/g)"
+    GrabarRegistroProtocolizado "$registro" "$3" "$2"
+    AgregarContadorALaTabla "$regex"
 else
-	registro="$( echo "$1" | sed s/";;"/";"$norma";"/g)"
-	GrabarRegistroProtocolizado "$registro" "$3" "$2"
-	ActualizarContadorDeLaTabla $norma "$regex"
+    registro="$( echo "$1" | sed s/";;"/";"$norma";"/g)"
+    GrabarRegistroProtocolizado "$registro" "$3" "$2"
+    ActualizarContadorDeLaTabla $norma "$regex"
 fi
 
 }
@@ -244,7 +246,7 @@ emisor="$(echo "$1" | cut -d '_' -f 3)"
 firma="$( grep "$emisor"";" "$MAEDIR/emisores.mae" | cut -d ';' -f 3 )"
 firmaDelRegistro="$(echo "$2" | cut -d ';' -f 8)"
 if [ "$firma" = "$firmaDelRegistro" ]; then
-	pasoValidacion=1
+    pasoValidacion=1
 fi
 
 return $pasoValidacion
@@ -256,7 +258,7 @@ ValidarNormaHistoricos(){
 pasoValidacion=0
 norma="$(echo "$1" | cut -d ';' -f 2)"
 if [ $norma -gt 0 ]; then
-	pasoValidacion=1
+    pasoValidacion=1
 fi
 return $pasoValidacion
 }
@@ -278,19 +280,19 @@ mesD="$(echo "$fechaDesde" | cut -d '/' -f 2)"
 anioD="$(echo "$fechaDesde" | cut -d '/' -f 3)"
 fechaDesdeComoNumero="$anioD""$mesD""$diaD"
 if [ $fechaComoNumero -ge $fechaDesdeComoNumero ]; then
-	autoNumera="$(echo "$registroDeGestiones" | cut -d ';' -f 5)"
-	if [ $autoNumera -ne 1 ]; then
-		fechaHasta="$(echo "$registroDeGestiones" | cut -d ';' -f 3)"
-		diaH="$(echo "$fechaHasta" | cut -d '/' -f 1)"
-		mesH="$(echo "$fechaHasta" | cut -d '/' -f 2)"
-		anioH="$(echo "$fechaHasta" | cut -d '/' -f 3)"
-		fechaHastaComoNumero="$anioH""$mesH""$diaH"		
-		if [ $fechaComoNumero -lt $fechaHastaComoNumero ]; then
-			pasoValidacion=1
-		fi
-	else
-		pasoValidacion=1
-	fi
+    autoNumera="$(echo "$registroDeGestiones" | cut -d ';' -f 5)"
+    if [ $autoNumera -ne 1 ]; then
+        fechaHasta="$(echo "$registroDeGestiones" | cut -d ';' -f 3)"
+        diaH="$(echo "$fechaHasta" | cut -d '/' -f 1)"
+        mesH="$(echo "$fechaHasta" | cut -d '/' -f 2)"
+        anioH="$(echo "$fechaHasta" | cut -d '/' -f 3)"
+        fechaHastaComoNumero="$anioH""$mesH""$diaH"        
+        if [ $fechaComoNumero -lt $fechaHastaComoNumero ]; then
+            pasoValidacion=1
+        fi
+    else
+        pasoValidacion=1
+    fi
 
 fi
 
@@ -312,11 +314,65 @@ mesActual="$(echo "$fechaActual" | cut -d '-' -f 2)"
 AnioActual="$(echo "$fechaActual" | cut -d '-' -f 1)"
 if [ $dia -lt 32 ] && [ $mes -lt 13 ] && [ $anio -le $AnioActual ]; then
 
-	pasoValidacion=1
+    pasoValidacion=1
 
 fi
 
 return $pasoValidacion
+
+}
+
+FuncionValidar(){
+#$1 es el nombre del archivo
+#$2 es cod de gestion
+#$3 es la linea
+    pasoTodasLasValidaciones=1
+    ValidarFechaNorma "$3"
+    pasoValidacionFecha=$?
+      if [ $pasoValidacionFecha -eq 1 ]; then
+        ValidarFechaNormaEnRangoDeGestion "$3" $2
+        pasoValidacionRangoDeFecha=$?
+        if [ $pasoValidacionRangoDeFecha -eq 1 ]; then
+            registroDeGestiones=$(grep "$2"";" $MAEDIR/gestiones.mae)
+            autoNumera="$(echo "$registroDeGestiones" | cut -d ';' -f 5)"
+            #si autoNumera es 1, entonces es un registro corriente, sino es historico            
+            if [ $autoNumera -eq 0 ]; then
+                ValidarNormaHistoricos "$3"
+                pasoHistoricos=$?
+                if [ $pasoHistoricos -ne 1 ]; then
+                    GrabarRegistroRechazado $2 "$3" $1 "numero de norma invalido"
+                    pasoTodasLasValidaciones=0
+                fi            
+            else                
+                ValidarCorrientes $1 "$3"
+                pasoCorrientes=$?
+                if [ $pasoCorrientes -eq 0 ]; then
+                    
+                    GrabarRegistroRechazado $2 "$3" $1 "codigo de firma invalido"
+                    pasoTodasLasValidaciones=0
+                fi    
+            fi
+            
+        else            
+            GrabarRegistroRechazado $2 "$3" $1 "fecha fuera del rango de la gestion"
+            pasoTodasLasValidaciones=0
+        fi
+    else
+    
+    GrabarRegistroRechazado $2 "$3" $1 "fecha invalida"
+    pasoTodasLasValidaciones=0
+    
+    fi
+    if [ $pasoTodasLasValidaciones -eq 1 ]; then
+    
+        if [ $autoNumera -eq 0 ]; then
+            
+            GrabarRegistroProtocolizado "$3" "$2" "$1"
+        else
+            ProtocolizarCorrientes "$3" "$1" "$2"
+        fi
+    
+    fi
 
 }
 
@@ -327,54 +383,10 @@ ValidarRegistros(){
 pasoTodasLasValidaciones=1
 while read linea
 do
-	pasoTodasLasValidaciones=1
-	ValidarFechaNorma "$linea"
-	pasoValidacionFecha=$?
-  	if [ $pasoValidacionFecha -eq 1 ]; then
-		ValidarFechaNormaEnRangoDeGestion "$linea" $2
-		pasoValidacionRangoDeFecha=$?
-		if [ $pasoValidacionRangoDeFecha -eq 1 ]; then
-			registroDeGestiones=$(grep "$2"";" $MAEDIR/gestiones.mae)
-			autoNumera="$(echo "$registroDeGestiones" | cut -d ';' -f 5)"
-			#si autoNumera es 1, entonces es un registro corriente, sino es historico			
-			if [ $autoNumera -eq 0 ]; then
-				ValidarNormaHistoricos "$linea"
-				pasoHistoricos=$?
-				if [ $pasoHistoricos -ne 1 ]; then
-					GrabarRegistroRechazado $2 "$linea" $1 "numero de norma invalido"
-					pasoTodasLasValidaciones=0
-				fi			
-			else				
-				ValidarCorrientes $1 "$linea"
-				pasoCorrientes=$?
-				if [ $pasoCorrientes -eq 0 ]; then
-					
-					GrabarRegistroRechazado $2 "$linea" $1 "codigo de firma invalido"
-					pasoTodasLasValidaciones=0
-				fi	
-			fi
-			
-		else			
-			GrabarRegistroRechazado $2 "$linea" $1 "fecha fuera del rango de la gestion"
-			pasoTodasLasValidaciones=0
-		fi
-	else
-	
-	GrabarRegistroRechazado $2 "$linea" $1 "fecha invalida"
-	pasoTodasLasValidaciones=0
-	
-	fi
-	if [ $pasoTodasLasValidaciones -eq 1 ]; then
-	
-		if [ $autoNumera -eq 0 ]; then
-			
-			GrabarRegistroProtocolizado "$linea" "$2" "$1"
-		else
-			ProtocolizarCorrientes "$linea" "$1" "$2"
-		fi
-	
-	fi
+    FuncionValidar "$1" "$2" "$linea"
 done < $ACEPDIR/"$2"/"$1"
+
+    FuncionValidar "$1" "$2" "$linea"
 }
 
 
@@ -383,14 +395,14 @@ norma="$(echo "$1" | cut -d '_' -f 2)"
 emisor="$(echo "$1" | cut -d '_' -f 3)"
 aux=($(grep "$norma"";""$emisor" $MAEDIR/tab/nxe.tab))
 if [ "${#aux[@]}" != 0 ]; then
-	ValidarRegistros $1 $2
-	# grabar log 
-	contadorAceptados=$((contadorAceptados+1))
-	$GRUPO/Mover.sh $ACEPDIR/"$2"/"$1" $PROCDIR/proc ProPro.sh
+    ValidarRegistros $1 $2
+    # grabar log 
+    contadorAceptados=$((contadorAceptados+1))
+    $GRUPO/Mover.sh $ACEPDIR/"$2"/"$1" $PROCDIR/proc ProPro.sh
 else
-	$GRUPO/Glog.sh "$nombreScript" "Se rechaza el archivo. Emisor no habilitado en este tipo de norma." "ERR"
-	contadorRechazados=$((contadorRechazados+1))
-	$GRUPO/Mover.sh $ACEPDIR/"$2"/"$1" $RECHDIR ProPro.sh
+    $GRUPO/Glog.sh "$nombreScript" "Se rechaza el archivo. Emisor no habilitado en este tipo de norma." "ERR"
+    contadorRechazados=$((contadorRechazados+1))
+    $GRUPO/Mover.sh $ACEPDIR/"$2"/"$1" $RECHDIR ProPro.sh
 fi
 
 }
@@ -400,11 +412,11 @@ ProcesarArchivo(){
 cd $PROCDIR/proc
 $GRUPO/Glog.sh "$nombreScript" "Archivo a procesar: $1" "INFO"
 if [ -s $1 ]; then
-	$GRUPO/Glog.sh "$nombreScript" "Se rechaza el archivo por estar DUPLICADO." "ERR"
-	contadorRechazados=$((contadorRechazados+1))
-	$GRUPO/Mover.sh $ACEPDIR/"$2"/"$1" $RECHDIR ProPro.sh
+    $GRUPO/Glog.sh "$nombreScript" "Se rechaza el archivo por estar DUPLICADO." "ERR"
+    contadorRechazados=$((contadorRechazados+1))
+    $GRUPO/Mover.sh $ACEPDIR/"$2"/"$1" $RECHDIR ProPro.sh
 else
-	ValidarNormaEmisor $1 $2
+    ValidarNormaEmisor $1 $2
 fi
 
 }
@@ -413,25 +425,24 @@ for i in "${ARRAY[@]}"
 do
 cd $ACEPDIR/$i
 
-	variable2=($(ls | sort -t '-' -k 3 -k 2 -k 1))
-	for j in "${variable2[@]}"
-	do
-		ProcesarArchivo $j $i
-	done	
+    variable2=($(ls | sort -t '-' -k 3 -k 2 -k 1))
+    for j in "${variable2[@]}"
+    do
+        ProcesarArchivo $j $i
+    done    
 done
 
 cd $MAEDIR/tab
 if [ -e axgAux ]; then
-	mv axgAux axg.tab
+    mv axgAux axg.tab
 fi
 
 if [ -e axgAux2 ]; then
-	rm axgAux2
+    rm axgAux2
 fi
 #los tres logs de los contadores
 #log de fin de propro
-
-$GRUPO/Glog.sh "$nombreScript" "Cantidad de archivos a procesar" "INFO"
+$GRUPO/Glog.sh "$nombreScript" "Cantidad de archivos a procesar ""$numeroDeArchivosAceptados" "INFO"
 $GRUPO/Glog.sh "$nombreScript" "Cantidad de archivos procesados $contadorAceptados" "INFO"
 $GRUPO/Glog.sh "$nombreScript" "Cantidad dearchivos rechazados $contadorRechazados" "INFO"
 $GRUPO/Glog.sh "$nombreScript" "Fin de ProPro" "INFO"
