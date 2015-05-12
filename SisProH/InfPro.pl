@@ -93,8 +93,9 @@ sub decideWhatToDo {
 sub checkeos {
 	#Checkeo que no se esté ejecutando ya
 	$checkIfAlreadyRunningLikeASpeedRunner = `ps -a | grep InfPro.pl\$`;
-	chomp($checkIfAlreadyRunningLikeASpeedRunner);
-	if ($checkIfAlreadyRunningLikeASpeedRunner ne ""){
+	chomp ($checkIfAlreadyRunningLikeASpeedRunner);
+	$linesOfSpeedRunner = `echo "$checkIfAlreadyRunningLikeASpeedRunner" | wc -l`;
+	if ($linesOfSpeedRunner > 1){
 
 		my $bell = chr(7);
 		print $bell;
@@ -576,7 +577,7 @@ sub menuInforme {
 
 sub mostrarDataInformes {
 	my ($keyWord,$opcionUno,$opcionDosDesde,$opcionDosHasta,$opcionTresDesde,$opcionTresHasta,$opcionCuatro,$opcionCinco) = @_;
-	my (@filesToProcess, @dataToFilter);
+	my (@filesToProcess, @dataToFilter,@filesToProcessCompleteDir);
 	`reset`;
 
 	if ($ARGV[0] eq '-ig') {
@@ -612,7 +613,13 @@ sub mostrarDataInformes {
 		}
 	}
 
-	@dataToFilter = &filterInformeTipoNorma($opcionUno,@filesToProcess);
+	foreach (@filesToProcess){
+		my $var = "$INFODIR/$_";
+		push(@filesToProcessCompleteDir,$var);
+	}
+
+	@dataToFilter = &filterInformeTipoNorma($opcionUno,@filesToProcessCompleteDir);
+
 	if ($opcionDosDesde != -1){
 		@dataToFilter = &filterInformeYear($opcionDosDesde,$opcionDosHasta,@dataToFilter);
 	}	#Lo aplico sólo si no lo dejé vacío
@@ -675,6 +682,20 @@ sub mostrarDataInformes {
 		}
 
 	}
+}
+
+sub filterInformeEmisor {
+	my ($emisor,@dataToFilter) = @_;
+	my (@retval);
+
+	foreach $data (@dataToFilter){
+		my $suEmisor = `echo "$data" | cut -d ';' -f 6`;
+		chomp($suEmisor);
+		if( "$emisor" eq "$suEmisor"){
+			push (@retval,$data);
+		}
+	}
+	return (@retval);
 }
 
 sub menuPreguntaSiSeguirViendoInformes {
